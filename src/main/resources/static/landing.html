@@ -1,0 +1,1416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NutriHeal - AI-Powered Nutrition Recommendations</title>
+<link
+	href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css"
+	rel="stylesheet">
+<link
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+	rel="stylesheet">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌱</text></svg>">
+    
+<style>
+:root {
+	--primary: #28a745;
+	--secondary: #17a2b8;
+	--accent: #ffc107;
+	--dark: #212529;
+}
+
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
+
+body {
+	font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+	overflow-x: hidden;
+}
+
+/* Navbar */
+.navbar {
+	background: rgba(255, 255, 255, 0.98);
+	backdrop-filter: blur(10px);
+	box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+	padding: 1rem 0;
+	transition: all 0.3s ease;
+}
+
+.navbar-brand {
+	font-size: 1.8rem;
+	font-weight: 700;
+	color: var(--primary);
+}
+
+.nav-link {
+	font-weight: 500;
+	margin: 0 10px;
+	transition: color 0.3s ease;
+}
+
+.nav-link:hover {
+	color: var(--primary);
+}
+
+.btn-primary {
+	background: linear-gradient(45deg, var(--primary), var(--secondary));
+	border: none;
+	padding: 10px 30px;
+	border-radius: 25px;
+	font-weight: 600;
+	transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+	transform: translateY(-2px);
+	box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4);
+}
+
+.btn-outline-primary {
+	border: 2px solid var(--primary);
+	color: var(--primary);
+	padding: 10px 30px;
+	border-radius: 25px;
+	font-weight: 600;
+	transition: all 0.3s ease;
+}
+
+.btn-outline-primary:hover {
+	background: var(--primary);
+	color: white;
+}
+
+/* Hero Section */
+.hero {
+	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+	color: white;
+	padding: 120px 0 80px;
+	padding-top: 140px;
+	position: relative;
+	overflow: hidden;
+}
+
+.hero::before {
+	content: '';
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background:
+		url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="%23ffffff" fill-opacity="0.1" d="M0,96L48,112C96,128,192,160,288,160C384,160,480,128,576,122.7C672,117,768,139,864,138.7C960,139,1056,117,1152,122.7C1248,128,1344,160,1392,176L1440,192L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>')
+		no-repeat bottom;
+	background-size: cover;
+}
+
+.hero h1 {
+	font-size: 3.5rem;
+	font-weight: 700;
+	margin-bottom: 20px;
+	animation: fadeInUp 1s ease;
+}
+
+.hero p {
+	font-size: 1.3rem;
+	margin-bottom: 30px;
+	animation: fadeInUp 1.2s ease;
+}
+
+.hero-buttons {
+	animation: fadeInUp 1.4s ease;
+	position: relative;
+	z-index: 1;
+}
+
+@keyframes fadeInUp {from { opacity:0;
+	transform: translateY(30px);
+}
+
+to {
+	opacity: 1;
+	transform: translateY(0);
+}
+
+}
+
+/* Features Section */
+.features {
+	padding: 80px 0;
+	background: #f8f9fa;
+}
+
+.feature-card {
+	background: white;
+	border-radius: 20px;
+	padding: 40px;
+	text-align: center;
+	box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+	transition: all 0.3s ease;
+	height: 100%;
+}
+
+.feature-card:hover {
+	transform: translateY(-10px);
+	box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+}
+
+.feature-icon {
+	font-size: 3.5rem;
+	color: var(--primary);
+	margin-bottom: 20px;
+}
+
+.feature-card h3 {
+	font-size: 1.5rem;
+	font-weight: 600;
+	margin-bottom: 15px;
+	color: var(--dark);
+}
+
+/* How It Works Section */
+.how-it-works {
+	padding: 80px 0;
+	background: white;
+}
+
+.step-card {
+	text-align: center;
+	padding: 30px;
+	position: relative;
+}
+
+.step-number {
+	width: 80px;
+	height: 80px;
+	background: linear-gradient(45deg, var(--primary), var(--secondary));
+	color: white;
+	border-radius: 50%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 2rem;
+	font-weight: 700;
+	margin: 0 auto 20px;
+	box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
+}
+
+.step-card h4 {
+	font-size: 1.3rem;
+	font-weight: 600;
+	margin-bottom: 15px;
+}
+
+/* Stats Section */
+.stats {
+	padding: 60px 0;
+	background: linear-gradient(45deg, var(--primary), var(--secondary));
+	color: white;
+}
+
+.stat-item {
+	text-align: center;
+	padding: 20px;
+}
+
+.stat-number {
+	font-size: 3rem;
+	font-weight: 700;
+	margin-bottom: 10px;
+}
+
+.stat-label {
+	font-size: 1.1rem;
+	opacity: 0.9;
+}
+
+/* CTA Section */
+.cta {
+	padding: 80px 0;
+	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+	color: white;
+	text-align: center;
+}
+
+.cta h2 {
+	font-size: 2.5rem;
+	font-weight: 700;
+	margin-bottom: 20px;
+}
+
+.cta p {
+	font-size: 1.2rem;
+	margin-bottom: 30px;
+}
+
+/* Footer */
+.footer {
+	background: var(--dark);
+	color: white;
+	padding: 40px 0 20px;
+}
+
+.footer-links {
+	list-style: none;
+	padding: 0;
+}
+
+.footer-links li {
+	margin-bottom: 10px;
+}
+
+.footer-links a {
+	color: rgba(255, 255, 255, 0.8);
+	text-decoration: none;
+	transition: color 0.3s ease;
+}
+
+.footer-links a:hover {
+	color: white;
+}
+
+.social-icons a {
+	color: white;
+	font-size: 1.5rem;
+	margin: 0 10px;
+	transition: color 0.3s ease;
+}
+
+.social-icons a:hover {
+	color: var(--primary);
+}
+
+/* Modal Styling */
+.modal-header {
+	background: linear-gradient(45deg, var(--primary), var(--secondary));
+	color: white;
+}
+
+.modal-body {
+	padding: 30px;
+}
+
+.form-control {
+	border-radius: 10px;
+	padding: 12px;
+	border: 2px solid #e9ecef;
+}
+
+.form-control:focus {
+	border-color: var(--primary);
+	box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+}
+
+@media ( max-width : 768px) {
+	.hero h1 {
+		font-size: 2.5rem;
+	}
+	.hero p {
+		font-size: 1.1rem;
+	}
+}
+</style>
+</head>
+<body>
+	<!-- Navigation -->
+	<nav class="navbar navbar-expand-lg navbar-light fixed-top">
+		<div class="container">
+			<a class="navbar-brand" class="nav-link" href="#home"> <i
+				class="fas fa-leaf"></i> NutriHeal
+			</a>
+			<button class="navbar-toggler" type="button"
+				data-bs-toggle="collapse" data-bs-target="#navbarNav">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+			<div class="collapse navbar-collapse" id="navbarNav">
+				<ul class="navbar-nav ms-auto">
+					<li class="nav-item"><a class="nav-link" href="#home">Home</a>
+					</li>
+					<li class="nav-item"><a class="nav-link" href="#features">Features</a>
+					</li>
+					<li class="nav-item"><a class="nav-link" href="#how-it-works">How
+							It Works</a></li>
+					<li class="nav-item"><a class="nav-link" href="#about">About</a>
+					</li>
+					<li class="nav-item">
+						<button class="btn btn-outline-primary ms-2"
+							data-bs-toggle="modal" data-bs-target="#loginModal">
+							<i class="fas fa-sign-in-alt"></i> Sign In
+						</button>
+					</li>
+					<li class="nav-item">
+						<button class="btn btn-primary ms-2" data-bs-toggle="modal"
+							data-bs-target="#signupModal">
+							<i class="fas fa-user-plus"></i> Sign Up
+						</button>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</nav>
+
+	<!-- Hero Section -->
+	<section id="home" class="hero">
+		<div class="container">
+			<div class="row align-items-center">
+				<div class="col-lg-6">
+					<h1>Your Personalized Nutrition Journey Starts Here</h1>
+					<p>AI-powered nutrition recommendations tailored to your health
+						symptoms and lifestyle goals</p>
+					<div class="hero-buttons">
+						<button class="btn btn-primary btn-lg me-3" type="button"
+							data-bs-toggle="modal" data-bs-target="#signupModal">
+							Get Started Free</button>
+						<button class="btn btn-outline-light btn-lg" type="button"
+							data-bs-toggle="modal" data-bs-target="#learnMoreModal">
+							Learn More</button>
+					</div>
+				</div>
+				<div class="col-lg-6 text-center">
+					<i class="fas fa-heartbeat" style="font-size: 15rem; opacity: 0.2;"></i>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<!-- Features Section -->
+	<section id="features" class="features">
+		<div class="container">
+			<div class="text-center mb-5">
+				<h2 class="display-5 fw-bold">Why Choose NutriHeal?</h2>
+				<p class="lead text-muted">Science-backed nutrition guidance
+					powered by artificial intelligence</p>
+			</div>
+			<div class="row g-4">
+				<div class="col-md-4">
+					<div class="feature-card">
+						<div class="feature-icon">
+							<i class="fas fa-brain"></i>
+						</div>
+						<h3>AI-Powered Analysis</h3>
+						<p>Advanced algorithms analyze your symptoms and health
+							profile to provide personalized nutrition recommendations</p>
+					</div>
+				</div>
+				<div class="col-md-4">
+					<div class="feature-card">
+						<div class="feature-icon">
+							<i class="fas fa-apple-alt"></i>
+						</div>
+						<h3>Comprehensive Food Database</h3>
+						<p>Access detailed nutritional information for thousands of
+							foods with complete vitamin and mineral breakdowns</p>
+					</div>
+				</div>
+				<div class="col-md-4">
+					<div class="feature-card">
+						<div class="feature-icon">
+							<i class="fas fa-calendar-alt"></i>
+						</div>
+						<h3>Personalized Meal Plans</h3>
+						<p>Get customized 7-day meal plans designed specifically for
+							your health goals and dietary needs</p>
+					</div>
+				</div>
+				<div class="col-md-4">
+					<div class="feature-card">
+						<div class="feature-icon">
+							<i class="fas fa-chart-line"></i>
+						</div>
+						<h3>Track Your Progress</h3>
+						<p>Monitor your health improvements and adjust recommendations
+							based on your feedback and results</p>
+					</div>
+				</div>
+				<div class="col-md-4">
+					<div class="feature-card">
+						<div class="feature-icon">
+							<i class="fas fa-user-md"></i>
+						</div>
+						<h3>Evidence-Based</h3>
+						<p>All recommendations are backed by scientific research and
+							clinical nutrition guidelines</p>
+					</div>
+				</div>
+				<div class="col-md-4">
+					<div class="feature-card">
+						<div class="feature-icon">
+							<i class="fas fa-mobile-alt"></i>
+						</div>
+						<h3>Accessible Anywhere</h3>
+						<p>Access your nutrition plan from any device, anytime,
+							anywhere with our responsive platform</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<!-- How It Works Section -->
+	<section id="how-it-works" class="how-it-works">
+		<div class="container">
+			<div class="text-center mb-5">
+				<h2 class="display-5 fw-bold">How It Works</h2>
+				<p class="lead text-muted">Get personalized nutrition
+					recommendations in 4 simple steps</p>
+			</div>
+			<div class="row g-4">
+				<div class="col-md-3">
+					<div class="step-card">
+						<div class="step-number">1</div>
+						<h4>Create Your Profile</h4>
+						<p>Tell us about yourself - age, lifestyle, and health goals</p>
+					</div>
+				</div>
+				<div class="col-md-3">
+					<div class="step-card">
+						<div class="step-number">2</div>
+						<h4>Report Symptoms</h4>
+						<p>Select your current health symptoms or concerns</p>
+					</div>
+				</div>
+				<div class="col-md-3">
+					<div class="step-card">
+						<div class="step-number">3</div>
+						<h4>Get Recommendations</h4>
+						<p>Receive AI-generated nutrition recommendations</p>
+					</div>
+				</div>
+				<div class="col-md-3">
+					<div class="step-card">
+						<div class="step-number">4</div>
+						<h4>Follow Your Plan</h4>
+						<p>Access your personalized meal plans and track progress</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<!-- Stats Section -->
+	<section class="stats">
+		<div class="container">
+			<div class="row">
+				<div class="col-md-3">
+					<div class="stat-item">
+						<div class="stat-number">500+</div>
+						<div class="stat-label">Foods in Database</div>
+					</div>
+				</div>
+				<div class="col-md-3">
+					<div class="stat-item">
+						<div class="stat-number">50+</div>
+						<div class="stat-label">Health Conditions</div>
+					</div>
+				</div>
+				<div class="col-md-3">
+					<div class="stat-item">
+						<div class="stat-number">1000+</div>
+						<div class="stat-label">Users Helped</div>
+					</div>
+				</div>
+				<div class="col-md-3">
+					<div class="stat-item">
+						<div class="stat-number">24/7</div>
+						<div class="stat-label">Access Available</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<!-- CTA Section -->
+	<section id="about" class="cta">
+		<div class="container">
+			<h2>Ready to Transform Your Health?</h2>
+			<p>Join thousands of users who have improved their health with
+				personalized nutrition</p>
+			<button class="btn btn-light btn-lg" data-bs-toggle="modal"
+				data-bs-target="#signupModal">Start Your Free Assessment</button>
+		</div>
+	</section>
+
+	<!-- Footer -->
+	<footer class="footer">
+		<div class="container">
+			<div class="row">
+				<div class="col-md-4 mb-4">
+					<h5>
+						<i class="fas fa-leaf"></i> NutriHeal
+					</h5>
+					<p>AI-powered personalized nutrition recommendations for better
+						health</p>
+					<div class="social-icons">
+						<a href="#"><i class="fab fa-facebook"></i></a> <a href="#"><i
+							class="fab fa-twitter"></i></a> <a href="#"><i
+							class="fab fa-instagram"></i></a> <a href="#"><i
+							class="fab fa-linkedin"></i></a>
+					</div>
+				</div>
+				<div class="col-md-4 mb-4">
+					<h5>Quick Links</h5>
+					<ul class="footer-links">
+						<li><a href="#features">Features</a></li>
+						<li><a href="#how-it-works">How It Works</a></li>
+						<li><a href="patient.html">Patient Portal</a></li>
+					</ul>
+				</div>
+				<div class="col-md-4 mb-4">
+					<h5>Legal</h5>
+					<ul class="footer-links">
+						<li><a href="#" data-bs-toggle="modal"
+							data-bs-target="#privacyModal">Privacy Policy</a></li>
+						<li><a href="#" data-bs-toggle="modal"
+							data-bs-target="#termsModal">Terms of Service</a></li>
+						<li><a href="#" data-bs-toggle="modal"
+							data-bs-target="#learnMoreModal">About NutriHeal</a></li>
+						<li><a href="#">Contact Us</a></li>
+					</ul>
+				</div>
+
+			</div>
+			<hr style="border-color: rgba(255, 255, 255, 0.2);">
+			<div class="text-center">
+				<p>&copy; 2024 NutriHeal. All rights reserved. This is an
+					educational project.</p>
+			</div>
+		</div>
+	</footer>
+
+	<!-- Login Modal -->
+	<div class="modal fade" id="loginModal" tabindex="-1">
+		<div class="modal-dialog modal-dialog-centered">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">
+						<i class="fas fa-sign-in-alt"></i> Sign In to NutriHeal
+					</h5>
+					<button type="button" class="btn-close btn-close-white"
+						data-bs-dismiss="modal"></button>
+				</div>
+				<div class="modal-body">
+					<form id="loginForm" autocomplete="off">
+						<div class="mb-3">
+							<label for="loginEmail" class="form-label">Email address</label>
+							<input type="email" class="form-control" id="loginEmail"
+								placeholder="Enter your email" autocomplete="off" required>
+						</div>
+						<div class="mb-3 position-relative">
+							<label for="loginPassword" class="form-label">Password</label>
+							<div class="input-group">
+								<input type="password" class="form-control" id="loginPassword"
+									placeholder="Enter your password" autocomplete="new-password"
+									required>
+								<button class="btn btn-outline-secondary" type="button"
+									id="togglePassword">👁️</button>
+							</div>
+						</div>
+						<div class="mb-3 form-check">
+							<input type="checkbox" class="form-check-input" id="rememberMe">
+							<label class="form-check-label" for="rememberMe">Remember
+								me</label>
+						</div>
+						<button type="submit" class="btn btn-primary w-100">Sign
+							In</button>
+					</form>
+					<hr>
+					<div class="text-center">
+						<p class="mb-2">
+							Don't have an account? <a href="#" data-bs-dismiss="modal"
+								data-bs-toggle="modal" data-bs-target="#signupModal">Sign up</a>
+						</p>
+						<p>
+							<a href="#" data-bs-toggle="modal"
+								data-bs-target="#forgotPasswordModal" data-bs-dismiss="modal">Forgot
+								password?</a>
+						</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Signup Modal -->
+	<div class="modal fade" id="signupModal" tabindex="-1">
+		<div class="modal-dialog modal-dialog-centered modal-lg">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">
+						<i class="fas fa-user-plus"></i> Create Your Account
+					</h5>
+					<button type="button" class="btn-close btn-close-white"
+						data-bs-dismiss="modal"></button>
+				</div>
+				<div class="modal-body">
+					<form id="signupForm" autocomplete="off">
+						<div class="row">
+							<div class="col-md-6 mb-3">
+								<label for="signupFullName" class="form-label">Full Name</label>
+								<input type="text" class="form-control" id="signupFullName" required>
+							</div>
+							<div class="col-md-6 mb-3">
+								<label for="loginEmail" class="form-label">Email address</label>
+								<input type="email" class="form-control" id="signupEmail"
+									placeholder="Enter your email" autocomplete="off" required>
+							</div>
+							<div class="col-md-6 mb-3 position-relative">
+								<label for="signupPassword" class="form-label">Password</label>
+								<div class="input-group">
+									<input type="password" class="form-control" id="signupPassword"
+										placeholder="Enter your password" autocomplete="new-password"
+										required>
+									<button type="button"
+										class="btn btn-outline-secondary toggle-password"
+										data-target="signupPassword" tabindex="-1">
+										<i class="fas fa-eye"></i>
+									</button>
+								</div>
+							</div>
+
+							<div class="col-md-6 mb-3 position-relative">
+								<label for="signupConfirmPassword" class="form-label">Confirm
+									Password</label>
+								<div class="input-group">
+									<input type="password" class="form-control"
+										id="signupConfirmPassword" placeholder="Confirm password"
+										required>
+									<button type="button"
+										class="btn btn-outline-secondary toggle-password"
+										data-target="signupConfirmPassword" tabindex="-1">
+										<i class="fas fa-eye"></i>
+									</button>
+								</div>
+							</div>
+
+							<div class="col-md-6 mb-3">
+								<label for="signupAge" class="form-label">Age</label> <input
+									type="number" class="form-control" id="signupAge"
+									placeholder="25" min="13" max="120" required>
+							</div>
+							<div class="col-md-6 mb-3">
+								<label for="signupGender" class="form-label">Gender</label> <select
+									class="form-control" id="signupGender" required>
+									<option value="">Select Gender</option>
+									<option value="male">Male</option>
+									<option value="female">Female</option>
+									<option value="other">Other</option>
+								</select>
+							</div>
+						</div>
+						<div class="mb-3 form-check">
+							<input type="checkbox" class="form-check-input" id="termsAgree"
+								required> <label class="form-check-label"
+								for="termsAgree"> I agree to the <a href="#"
+								data-bs-toggle="modal" data-bs-target="#termsModal">Terms of
+									Service</a> and <a href="#" data-bs-toggle="modal"
+								data-bs-target="#privacyModal">Privacy Policy</a>
+							</label>
+						</div>
+						<button type="submit" class="btn btn-primary w-100">Create
+							Account</button>
+					</form>
+					<hr>
+					<div class="text-center">
+						<p>
+							Already have an account? <a href="#" data-bs-dismiss="modal"
+								data-bs-toggle="modal" data-bs-target="#loginModal">Sign in</a>
+						</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Learn More Modal -->
+	<div class="modal fade" id="learnMoreModal" tabindex="-1">
+		<div
+			class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">About NutriHeal</h5>
+					<button type="button" class="btn-close btn-close-white"
+						data-bs-dismiss="modal"></button>
+				</div>
+				<div class="modal-body">
+					<h5>What is NutriHeal?</h5>
+					<p>NutriHeal is an AI-powered nutrition recommendation system
+						designed to help individuals make informed dietary choices based
+						on their specific health symptoms and nutritional needs.</p>
+
+					<h5 class="mt-4">Our Approach</h5>
+					<p>We combine scientific research, clinical nutrition
+						guidelines, and artificial intelligence to provide personalized
+						food recommendations. Our system analyzes your health profile and
+						symptoms to suggest foods that may help address your specific
+						concerns.</p>
+
+					<h5 class="mt-4">How Our AI Works</h5>
+					<ul>
+						<li><strong>Symptom Analysis:</strong> Our system identifies
+							patterns between health symptoms and nutritional deficiencies or
+							needs</li>
+						<li><strong>Food Database:</strong> We maintain a
+							comprehensive database of foods with detailed nutritional
+							profiles</li>
+						<li><strong>Personalization:</strong> Recommendations are
+							tailored to your age, activity level, and health goals</li>
+						<li><strong>Evidence-Based:</strong> All recommendations are
+							grounded in nutritional science and research</li>
+					</ul>
+
+					<h5 class="mt-4">Who Can Benefit?</h5>
+					<p>NutriHeal is designed for individuals who:</p>
+					<ul>
+						<li>Experience digestive issues like bloating or constipation</li>
+						<li>Struggle with low energy or fatigue</li>
+						<li>Want to manage blood pressure through diet</li>
+						<li>Seek to reduce stress and anxiety through nutrition</li>
+						<li>Need guidance on immune-boosting foods</li>
+						<li>Want to improve overall health through better nutrition</li>
+					</ul>
+
+					<div class="alert alert-warning mt-4">
+						<h6>
+							<i class="fas fa-exclamation-triangle"></i> Important Note
+						</h6>
+						<p class="mb-0">NutriHeal provides nutritional guidance and
+							should not replace professional medical advice. Always consult
+							with healthcare providers for medical conditions, diagnosis, or
+							treatment.</p>
+					</div>
+
+					<h5 class="mt-4">Get Started Today</h5>
+					<p>Ready to transform your health through better nutrition?
+						Create your free account and begin your personalized nutrition
+						journey.</p>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary"
+						data-bs-dismiss="modal">Close</button>
+					<button type="button" class="btn btn-primary"
+						data-bs-dismiss="modal" data-bs-toggle="modal"
+						data-bs-target="#signupModal">Sign Up Now</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Terms of Service Modal -->
+	<div class="modal fade" id="termsModal" tabindex="-1">
+		<div
+			class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">Terms of Service</h5>
+					<button type="button" class="btn-close btn-close-white"
+						data-bs-dismiss="modal"></button>
+				</div>
+				<div class="modal-body">
+					<p>
+						<strong>Last Updated:</strong> November 2025
+					</p>
+
+					<h6>1. Acceptance of Terms</h6>
+					<p>By accessing and using NutriHeal, you accept and agree to be
+						bound by these Terms of Service. If you do not agree, please do
+						not use this service.</p>
+
+					<h6>2. Educational Purpose</h6>
+					<p>NutriHeal is an educational project designed to demonstrate
+						AI-powered nutrition recommendations. It is not intended as a
+						substitute for professional medical advice, diagnosis, or
+						treatment.</p>
+
+					<h6>3. Medical Disclaimer</h6>
+					<p>
+						<strong>IMPORTANT:</strong> The nutrition recommendations provided
+						by NutriHeal are for informational and educational purposes only.
+						They do not constitute medical advice and should not be used as a
+						replacement for consultation with qualified healthcare
+						professionals.
+					</p>
+					<ul>
+						<li>Always seek the advice of your physician or other
+							qualified health provider with questions regarding medical
+							conditions</li>
+						<li>Never disregard professional medical advice or delay
+							seeking it because of information obtained through NutriHeal</li>
+						<li>If you have or suspect you have a medical problem,
+							contact your healthcare provider immediately</li>
+					</ul>
+
+					<h6>4. User Responsibilities</h6>
+					<p>By using NutriHeal, you agree to:</p>
+					<ul>
+						<li>Provide accurate health information</li>
+						<li>Use recommendations as general guidance only</li>
+						<li>Consult healthcare professionals before making
+							significant dietary changes</li>
+						<li>Not rely solely on NutriHeal for medical decisions</li>
+						<li>Be aware of your own food allergies and dietary
+							restrictions</li>
+					</ul>
+
+					<h6>5. Account Security</h6>
+					<p>You are responsible for maintaining the confidentiality of
+						your account credentials and for all activities that occur under
+						your account.</p>
+
+					<h6>6. Data Collection and Use</h6>
+					<p>We collect and store health information you provide to
+						generate personalized recommendations. This data is used solely
+						for providing our service and is handled according to our Privacy
+						Policy.</p>
+
+					<h6>7. Limitation of Liability</h6>
+					<p>NutriHeal and its creators shall not be liable for any
+						direct, indirect, incidental, consequential, or special damages
+						arising from the use or inability to use this service, including
+						but not limited to health outcomes resulting from following
+						nutrition recommendations.</p>
+
+					<h6>8. No Warranties</h6>
+					<p>This service is provided "as is" without warranties of any
+						kind, either express or implied, including but not limited to
+						accuracy, completeness, or suitability for a particular purpose.</p>
+
+					<h6>9. Modifications</h6>
+					<p>We reserve the right to modify these terms at any time.
+						Continued use of the service after changes constitutes acceptance
+						of the modified terms.</p>
+
+					<h6>10. Contact</h6>
+					<p>For questions about these Terms of Service, please contact
+						us through our support channels.</p>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-primary"
+						data-bs-dismiss="modal">I Understand</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Privacy Policy Modal -->
+	<div class="modal fade" id="privacyModal" tabindex="-1">
+		<div
+			class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">Privacy Policy</h5>
+					<button type="button" class="btn-close btn-close-white"
+						data-bs-dismiss="modal"></button>
+				</div>
+				<div class="modal-body">
+					<p>
+						<strong>Last Updated:</strong> November 2025
+					</p>
+
+					<h6>1. Introduction</h6>
+					<p>This Privacy Policy explains how NutriHeal collects, uses,
+						and protects your personal information. We are committed to
+						ensuring your privacy and handling your data responsibly.</p>
+
+					<h6>2. Information We Collect</h6>
+					<p>
+						<strong>Personal Information:</strong>
+					</p>
+					<ul>
+						<li>Name and email address</li>
+						<li>Age and gender</li>
+						<li>Account credentials (username and password)</li>
+					</ul>
+					<p>
+						<strong>Health Information:</strong>
+					</p>
+					<ul>
+						<li>Self-reported health symptoms</li>
+						<li>Activity level and lifestyle information</li>
+						<li>Dietary preferences and restrictions</li>
+						<li>Food tracking data</li>
+					</ul>
+
+					<h6>3. How We Use Your Information</h6>
+					<p>We use your information to:</p>
+					<ul>
+						<li>Provide personalized nutrition recommendations</li>
+						<li>Generate customized meal plans</li>
+						<li>Track your progress and health journey</li>
+						<li>Improve our recommendation algorithms</li>
+						<li>Send you relevant health and nutrition information</li>
+						<li>Maintain and improve our service</li>
+					</ul>
+
+					<h6>4. Data Storage and Security</h6>
+					<p>Your data is stored securely in our MySQL database with the
+						following protections:</p>
+					<ul>
+						<li>Encrypted connections between your browser and our
+							servers</li>
+						<li>Secure database access controls</li>
+						<li>Regular security updates and monitoring</li>
+						<li>Limited access to personal data by authorized personnel
+							only</li>
+					</ul>
+
+					<h6>5. Data Sharing</h6>
+					<p>We do not sell, trade, or rent your personal information to
+						third parties. Your health data remains confidential and is used
+						solely for providing our service.</p>
+
+					<h6>6. Educational Context</h6>
+					<p>NutriHeal is an educational project. While we take data
+						security seriously, please be aware that this is a demonstration
+						application and should not be used to store sensitive medical
+						information.</p>
+
+					<h6>7. Your Rights</h6>
+					<p>You have the right to:</p>
+					<ul>
+						<li>Access your personal data stored in our system</li>
+						<li>Request correction of inaccurate data</li>
+						<li>Request deletion of your account and associated data</li>
+						<li>Opt-out of certain data collection practices</li>
+					</ul>
+
+					<h6>8. Cookies and Tracking</h6>
+					<p>We use browser storage (localStorage) to save your
+						preferences and maintain your session. This data remains on your
+						device and can be cleared at any time.</p>
+
+					<h6>9. Children's Privacy</h6>
+					<p>Our service is not intended for users under 13 years of age.
+						We do not knowingly collect personal information from children
+						under 13.</p>
+
+					<h6>10. Changes to Privacy Policy</h6>
+					<p>We may update this Privacy Policy from time to time. We will
+						notify users of any material changes through our platform.</p>
+
+					<h6>11. Contact Information</h6>
+					<p>If you have questions or concerns about your privacy or this
+						policy, please contact us through our support channels.</p>
+
+					<div class="alert alert-info mt-3">
+						<p class="mb-0">
+							<strong>Note:</strong> By using NutriHeal, you acknowledge that
+							you have read and understood this Privacy Policy and agree to its
+							terms.
+						</p>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-primary"
+						data-bs-dismiss="modal">Close</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Forgot Password Modal -->
+	<div class="modal fade" id="forgotPasswordModal" tabindex="-1">
+		<div class="modal-dialog modal-dialog-centered">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">
+						<i class="fas fa-key"></i> Reset Password
+					</h5>
+					<button type="button" class="btn-close btn-close-white"
+						data-bs-dismiss="modal"></button>
+				</div>
+				<div class="modal-body">
+					<!-- Step 1: Email Input -->
+					<div id="emailStep">
+						<p>Enter your email address and we'll send you an OTP to reset
+							your password.</p>
+						<form id="forgotPasswordForm">
+							<div class="mb-3">
+								<label for="resetEmail" class="form-label">Email Address</label>
+								<input type="email" class="form-control" id="resetEmail"
+									placeholder="Enter your email" required>
+							</div>
+							<button type="submit" class="btn btn-primary w-100">Send
+								OTP</button>
+						</form>
+					</div>
+
+					<!-- Step 2: OTP Verification -->
+					<div id="otpStep" class="d-none">
+						<p>Enter the 6-digit OTP sent to your email.</p>
+						<form id="verifyOtpForm">
+							<div class="mb-3">
+								<label for="otpCode" class="form-label">OTP Code</label> <input
+									type="text" class="form-control" id="otpCode"
+									placeholder="Enter 6-digit OTP" maxlength="6" required>
+								<small class="text-muted">OTP expires in 5 minutes</small>
+							</div>
+							<button type="submit" class="btn btn-primary w-100">Verify
+								OTP</button>
+							<button type="button" class="btn btn-link w-100"
+								onclick="resendOTP()">Resend OTP</button>
+						</form>
+					</div>
+
+					<!-- Step 3: New Password -->
+					<div id="newPasswordStep" class="d-none">
+						<p>Create your new password.</p>
+						<form id="newPasswordForm">
+							<div class="mb-3">
+								<label for="newPassword" class="form-label">New Password</label>
+								<input type="password" class="form-control" id="newPassword"
+									placeholder="Enter new password" required>
+							</div>
+							<div class="mb-3">
+								<label for="confirmNewPassword" class="form-label">Confirm
+									Password</label> <input type="password" class="form-control"
+									id="confirmNewPassword" placeholder="Confirm new password"
+									required>
+							</div>
+							<button type="submit" class="btn btn-primary w-100">Reset
+								Password</button>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Alert Container -->
+	<div id="alertContainer"
+		style="position: fixed; top: 20px; right: 20px; z-index: 9999; max-width: 400px;"></div>
+
+	<script
+		src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+	<script>
+
+	
+	const togglePassword = document.getElementById('togglePassword');
+	  const passwordInput = document.getElementById('loginPassword');
+
+	  togglePassword.addEventListener('click', () => {
+	    const type =
+	      passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+	    passwordInput.setAttribute('type', type);
+
+	    // Optional: change icon when toggled
+	    togglePassword.textContent = type === 'password' ? '👁️' : '🙈';
+	  });
+	  
+	// Universal password toggle handler
+	  document.querySelectorAll('.toggle-password').forEach(btn => {
+	    btn.addEventListener('click', function () {
+	      const targetId = this.getAttribute('data-target');
+	      const field = document.getElementById(targetId);
+	      const icon = this.querySelector('i');
+
+	      if (field.type === 'password') {
+	        field.type = 'text';
+	        icon.classList.replace('fa-eye', 'fa-eye-slash');
+	      } else {
+	        field.type = 'password';
+	        icon.classList.replace('fa-eye-slash', 'fa-eye');
+	      }
+	    });
+	  });
+
+	
+        const API_BASE_URL = 'http://localhost:8080/api';
+
+        function showAlert(message, type = 'success') {
+            const alertContainer = document.getElementById('alertContainer');
+            const alertId = 'alert-' + Date.now();
+            const alertHTML = `
+                <div id="${alertId}" class="alert alert-${type} alert-dismissible fade show" role="alert">
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            `;
+            alertContainer.insertAdjacentHTML('beforeend', alertHTML);
+            setTimeout(() => {
+                const alert = document.getElementById(alertId);
+                if (alert) alert.remove();
+            }, 5000);
+        }
+        
+        
+     // Login Form Handler
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/users`);
+                const users = await response.json();
+                
+                const user = users.find(u => u.email === email && u.password === password);
+                
+                if (user) {
+                    // Store user session
+                    sessionStorage.setItem('nutrihealUserId', user.id);
+                    sessionStorage.setItem('nutrihealUserEmail', user.email);
+                    sessionStorage.setItem('nutrihealUserData', JSON.stringify(user));
+                    
+                    showAlert('Login successful!', 'success');
+                    setTimeout(() => {
+                        window.location.href = 'patient.html';
+                    }, 1500);
+                } else {
+                    showAlert('Invalid email or password', 'danger');
+                }
+            } catch (error) {
+                showAlert('Login failed. Please try again.', 'danger');
+            }
+        });
+
+     // Signup Form Handler
+        document.getElementById('signupForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const password = document.getElementById('signupPassword').value;
+            const confirmPassword = document.getElementById('signupConfirmPassword').value;
+            
+            if (password !== confirmPassword) {
+                showAlert('Passwords do not match!', 'danger');
+                return;
+            }
+
+            const userData = {
+                username: document.getElementById('signupFullName').value.toLowerCase().replace(/\s+/g, '_'),
+                email: document.getElementById('signupEmail').value,
+                password: password,
+                age: parseInt(document.getElementById('signupAge').value),
+                gender: document.getElementById('signupGender').value
+            };
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/users`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(userData)
+                });
+
+                if (response.status === 201) {
+                    const user = await response.json();
+                    // Store user ID in session for patient portal
+                    sessionStorage.setItem('nutrihealUserId', user.id);
+                    sessionStorage.setItem('nutrihealUserEmail', user.email);
+                    
+                    showAlert('Account created successfully! Redirecting to complete your profile...', 'success');
+                    setTimeout(() => {
+                        window.location.href = 'patient.html';
+                    }, 1500);
+                } else if (response.status === 409) {
+                    showAlert('Email already exists!', 'warning');
+                } else {
+                    showAlert('Registration failed. Please try again.', 'danger');
+                }
+            } catch (error) {
+                showAlert('Registration failed: ' + error.message, 'danger');
+            }
+        });
+
+        // Smooth scroll
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+        
+     // Forgot Password State
+        let resetEmail = '';
+
+        // Step 1: Send OTP
+        document.getElementById('forgotPasswordForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            resetEmail = document.getElementById('resetEmail').value;
+
+            try {
+                // Check if email exists in your users database first
+                const response = await fetch(`${API_BASE_URL}/users`);
+                const users = await response.json();
+                const user = users.find(u => u.email === resetEmail);
+
+                if (!user) {
+                    showAlert('Email not found in our system!', 'danger');
+                    return;
+                }
+
+                // Send OTP via backend email service
+                const otpResponse = await fetch(`${API_BASE_URL}/auth/send-otp`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: resetEmail })
+                });
+
+                if (!otpResponse.ok) {
+                    const errorText = await otpResponse.text();
+                    console.error('OTP send failed:', errorText);
+                    showAlert('Failed to send OTP email. Please check server logs.', 'danger');
+                    return;
+                }
+
+                const result = await otpResponse.json();
+
+                if (result.success) {
+                    showAlert(`OTP sent to ${resetEmail}! Check your inbox.`, 'success');
+                    
+                    // Show OTP step
+                    document.getElementById('emailStep').classList.add('d-none');
+                    document.getElementById('otpStep').classList.remove('d-none');
+                } else {
+                    showAlert(result.message || 'Failed to send OTP.', 'danger');
+                }
+                
+            } catch (error) {
+                console.error('Error in send OTP:', error);
+                showAlert('Network error. Please check your connection and try again.', 'danger');
+            }
+        });
+
+        // Step 2: Verify OTP
+        document.getElementById('verifyOtpForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const enteredOTP = document.getElementById('otpCode').value;
+
+            if (enteredOTP.length !== 6) {
+                showAlert('Please enter a valid 6-digit OTP.', 'warning');
+                return;
+            }
+
+            try {
+                const verifyResponse = await fetch(`${API_BASE_URL}/auth/verify-otp`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: resetEmail, otp: enteredOTP })
+                });
+
+                if (!verifyResponse.ok) {
+                    showAlert('Server error while verifying OTP.', 'danger');
+                    return;
+                }
+
+                const result = await verifyResponse.json();
+
+                if (result.success) {
+                    showAlert('OTP verified successfully!', 'success');
+                    document.getElementById('otpStep').classList.add('d-none');
+                    document.getElementById('newPasswordStep').classList.remove('d-none');
+                } else {
+                    showAlert(result.message || 'Invalid OTP. Please try again.', 'danger');
+                }
+            } catch (error) {
+                console.error('Error verifying OTP:', error);
+                showAlert('Network error during OTP verification.', 'danger');
+            }
+        });
+
+        // Resend OTP
+        async function resendOTP() {
+            try {
+                const otpResponse = await fetch(`${API_BASE_URL}/auth/send-otp`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: resetEmail })
+                });
+
+                if (!otpResponse.ok) {
+                    showAlert('Failed to resend OTP. Please try again.', 'danger');
+                    return;
+                }
+
+                const result = await otpResponse.json();
+                
+                if (result.success) {
+                    showAlert('New OTP sent to your email!', 'success');
+                } else {
+                    showAlert('Failed to resend OTP.', 'danger');
+                }
+            } catch (error) {
+                console.error('Error resending OTP:', error);
+                showAlert('Network error while resending OTP.', 'danger');
+            }
+        }
+
+        // Step 3: Reset Password
+        document.getElementById('newPasswordForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmNewPassword').value;
+
+            if (newPassword !== confirmPassword) {
+                showAlert('Passwords do not match!', 'danger');
+                return;
+            }
+
+            if (newPassword.length < 6) {
+                showAlert('Password must be at least 6 characters long.', 'warning');
+                return;
+            }
+
+            try {
+                // Get user ID
+                const response = await fetch(`${API_BASE_URL}/users`);
+                const users = await response.json();
+                const user = users.find(u => u.email === resetEmail);
+
+                if (!user) {
+                    showAlert('User not found!', 'danger');
+                    return;
+                }
+
+                // Update password
+                const updateResponse = await fetch(`${API_BASE_URL}/users/${user.id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        username: user.username,
+                        email: user.email,
+                        password: newPassword
+                    })
+                });
+
+                if (updateResponse.ok) {
+                    showAlert('Password reset successfully! Please login.', 'success');
+                    
+                    // Close modal and reset
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('forgotPasswordModal'));
+                    modal.hide();
+                    
+                    // Reset all forms and steps
+                    resetForgotPasswordModal();
+                    
+                    // Open login modal after a short delay
+                    setTimeout(() => {
+                        const loginModal = new bootstrap.Modal(document.getElementById('loginModal'));
+                        loginModal.show();
+                    }, 500);
+                } else {
+                    showAlert('Failed to update password. Please try again.', 'danger');
+                }
+            } catch (error) {
+                console.error('Error resetting password:', error);
+                showAlert('Network error while resetting password.', 'danger');
+            }
+        });
+
+        // Helper function to reset the modal
+        function resetForgotPasswordModal() {
+            document.getElementById('emailStep').classList.remove('d-none');
+            document.getElementById('otpStep').classList.add('d-none');
+            document.getElementById('newPasswordStep').classList.add('d-none');
+            document.getElementById('forgotPasswordForm').reset();
+            document.getElementById('verifyOtpForm').reset();
+            document.getElementById('newPasswordForm').reset();
+            resetEmail = '';
+        }
+    </script>
+</body>
+</html>

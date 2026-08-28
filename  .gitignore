@@ -1,0 +1,10 @@
+# Build files
+target/
+
+# Environment variables / secrets
+.env
+
+# IDE files
+.settings/
+.classpath
+.project

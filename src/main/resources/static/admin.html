@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NutriHeal - Admin Dashboard</title>
+<link
+	href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css"
+	rel="stylesheet">
+<link
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+	rel="stylesheet">
+	<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌱</text></svg>">
+	
+	
+<style>
+:root {
+	--primary-color: #28a745;
+	--secondary-color: #17a2b8;
+	--accent-color: #ffc107;
+	--dark-color: #343a40;
+}
+
+body {
+	font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+	background: linear-gradient(135deg, #ffffff 0%);
+	min-height: 100vh;
+}
+
+.navbar {
+	background: rgba(188, 247, 191, 0.95) !important;
+	backdrop-filter: blur(10px);
+	box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+}
+
+.hero-section {
+	background: linear-gradient(135deg, #6EC1FF);
+	color: white;
+	padding: 80px 0;
+	margin-left: 20px;
+	margin-right: 20px;
+	margin-bottom: 50px;
+	margin-top: 100px;
+	border-radius: 20px;
+}
+
+.card {
+	border: none;
+	border-radius: 15px;
+	box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+	transition: transform 0.3s ease, box-shadow 0.3s ease;
+	background: rgba(255, 255, 255, 0.95);
+	backdrop-filter: blur(10px);
+}
+
+.card:hover {
+	transform: translateY(-5px);
+	box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+}
+
+.btn-primary {
+	background: linear-gradient(45deg, var(--primary-color),
+		var(--secondary-color));
+	border: none;
+	border-radius: 25px;
+	padding: 12px 30px;
+	font-weight: 600;
+	transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+	transform: translateY(-2px);
+	box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4);
+}
+
+.food-card, .symptom-card {
+	background: linear-gradient(45deg, #f8f9fa, #e9ecef);
+	border-left: 4px solid var(--primary-color);
+	margin-bottom: 15px;
+	padding: 15px;
+	border-radius: 10px;
+}
+
+.nutrient-badge {
+	background: linear-gradient(45deg, var(--accent-color), #ffeb3b);
+	color: #333;
+	padding: 5px 10px;
+	border-radius: 15px;
+	font-size: 0.75rem;
+	margin: 2px;
+	display: inline-block;
+}
+
+.stats-card {
+	background: linear-gradient(45deg, rgba(35, 203, 91, 0.9));
+	color: white;
+	text-align: center;
+	padding: 30px;
+	border-radius: 15px;
+	margin-bottom: 20px;
+}
+
+.loading {
+	display: none;
+	text-align: center;
+	padding: 20px;
+}
+
+.tab-pane {
+	padding: 20px 0;
+}
+</style>
+</head>
+<body>
+	<!-- Navigation -->
+	<nav class="navbar navbar-expand-lg navbar-light fixed-top">
+		<div class="container">
+			<a class="navbar-brand fw-bold" href="#"> <i
+				class="fas fa-leaf text-success"></i> NutriHeal Admin
+			</a>
+			<button class="navbar-toggler" type="button"
+				data-bs-toggle="collapse" data-bs-target="#navbarNav">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+			<div class="collapse navbar-collapse" id="navbarNav">
+				<ul class="navbar-nav ms-auto">
+					<li class="nav-item"><a class="nav-link" href="#home">Dashboard</a>
+					</li>
+					<li class="nav-item"><a class="nav-link" href="landing.html"
+						target="_blank">Patient Interface</a></li>
+				</ul>
+			</div>
+		</div>
+	</nav>
+
+
+
+	<!-- Hero Section -->
+	<section id="home" class="hero-section">
+		<div class="container text-center">
+			<h1 class="display-4 fw-bold mb-4">
+				<i class="fas fa-cog"></i> Admin Dashboard
+			</h1>
+			<p class="lead mb-4">Manage Users, Foods, Symptoms &
+				Recommendations</p>
+			<div class="row justify-content-center">
+				<div class="col-md-10">
+					<div class="row">
+						<div class="col-md-3">
+							<div class="stats-card">
+								<h3 id="userCount">0</h3>
+								<p>Users</p>
+							</div>
+						</div>
+						<div class="col-md-3">
+							<div class="stats-card">
+								<h3 id="foodCount">0</h3>
+								<p>Foods</p>
+							</div>
+						</div>
+						<div class="col-md-3">
+							<div class="stats-card">
+								<h3 id="symptomCount">0</h3>
+								<p>Symptoms</p>
+							</div>
+						</div>
+						<div class="col-md-3">
+							<div class="stats-card">
+								<h3 id="recommendationCount">0</h3>
+								<p>Recommendations</p>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<!-- Main Content -->
+	<div class="container">
+		<!-- Navigation Tabs -->
+		<ul class="nav nav-pills mb-4" id="adminTabs" role="tablist">
+			<li class="nav-item" role="presentation">
+				<button class="nav-link active" id="users-tab" data-bs-toggle="pill"
+					data-bs-target="#users" type="button">
+					<i class="fas fa-users"></i> Users
+				</button>
+			</li>
+			<li class="nav-item" role="presentation">
+				<button class="nav-link" id="foods-tab" data-bs-toggle="pill"
+					data-bs-target="#foods" type="button">
+					<i class="fas fa-apple-alt"></i> Foods
+				</button>
+			</li>
+			<li class="nav-item" role="presentation">
+				<button class="nav-link" id="symptoms-tab" data-bs-toggle="pill"
+					data-bs-target="#symptoms" type="button">
+					<i class="fas fa-stethoscope"></i> Symptoms
+				</button>
+			</li>
+			<li class="nav-item" role="presentation">
+				<button class="nav-link" id="recommendations-tab"
+					data-bs-toggle="pill" data-bs-target="#recommendations"
+					type="button">
+					<i class="fas fa-link"></i> Recommendations
+				</button>
+			</li>
+		</ul>
+
+		<!-- Tab Content -->
+		<div class="tab-content" id="adminTabsContent">
+
+			<!-- Users Tab -->
+			<div class="tab-pane fade show active" id="users" role="tabpanel">
+				<div class="row">
+					<div class="col-md-6">
+						<div class="card mb-4">
+							<div class="card-header bg-primary text-white">
+								<h5 class="mb-0">
+									<i class="fas fa-user-plus"></i> Register New User
+								</h5>
+							</div>
+							<div class="card-body">
+								<form id="registerForm">
+									<div class="mb-3">
+										<label for="username" class="form-label">Username</label> <input
+											type="text" class="form-control" id="username" placeholder="User_Name"  required>
+									</div>
+									<div class="mb-3">
+										<label for="email" class="form-label">Email</label> <input
+											type="email" class="form-control" id="email" placeholder="Enter your email" required>
+									</div>
+									<div class="mb-3">
+										<label for="password" class="form-label">Password</label> <input
+											type="password" class="form-control" id="password" autocomplete="off"  required>
+									</div>
+									<button type="submit" class="btn btn-primary w-100">
+										<i class="fas fa-user-plus"></i> Register User
+									</button>
+								</form>
+							</div>
+						</div>
+					</div>
+					<div class="col-md-6">
+						<div class="card mb-4">
+							<div class="card-header bg-info text-white">
+								<h5 class="mb-0">
+									<i class="fas fa-search"></i> Search User
+								</h5>
+							</div>
+							<div class="card-body">
+								<div class="input-group mb-3">
+									<input type="text" class="form-control" id="searchUsername"
+										placeholder="Enter username">
+									<button class="btn btn-info" onclick="searchUser()">
+										<i class="fas fa-search"></i>
+									</button>
+								</div>
+								<div id="userResult"></div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="card">
+					<div
+						class="card-header bg-secondary text-white d-flex justify-content-between">
+						<h5 class="mb-0">
+							<i class="fas fa-users"></i> All Users
+						</h5>
+						<button class="btn btn-light btn-sm" onclick="loadAllUsers()">
+							<i class="fas fa-sync"></i> Refresh
+						</button>
+					</div>
+					<div class="card-body">
+						<div id="usersContainer" class="row"></div>
+					</div>
+				</div>
+			</div>
+
+
+
+			<!-- Foods Tab -->
+			<div class="tab-pane fade" id="foods" role="tabpanel">
+				<!-- ADDING FOODS -->
+				<div class="card mb-4">
+					<div class="card-header bg-success text-white">
+						<h5 class="mb-0">
+							<i class="fas fa-plus"></i> Add New Food
+						</h5>
+					</div>
+					<div class="card-body">
+						<form id="addFoodForm">
+							<div class="row">
+								<div class="col-md-6 mb-3">
+									<label class="form-label">Food Name</label> <input type="text"
+										class="form-control" id="foodName" required>
+								</div>
+								<div class="col-md-6 mb-3">
+									<label class="form-label">Category</label> <select
+										class="form-control" id="foodCategory" required>
+										<option value="">Select Category</option>
+										<option value="Leafy Green">Leafy Green</option>
+										<option value="Root Vegetable">Root Vegetable</option>
+										<option value="Fruit">Fruit</option>
+										<option value="Whole Grain">Whole Grain</option>
+										<option value="Fish">Fish</option>
+										<option value="Nuts">Nuts</option>
+										<option value="Beverage">Beverage</option>
+										<option value="Spice">Spice</option>
+									</select>
+								</div>
+								<div class="col-md-12 mb-3">
+									<label class="form-label">Description</label>
+									<textarea class="form-control" id="foodDescription" rows="2"></textarea>
+								</div>
+								<div class="col-md-3 mb-3">
+									<label class="form-label">Calories</label> <input type="number"
+										class="form-control" id="foodCalories" step="0.1">
+								</div>
+								<div class="col-md-3 mb-3">
+									<label class="form-label">Protein (g)</label> <input
+										type="number" class="form-control" id="foodProtein" step="0.1">
+								</div>
+								<div class="col-md-3 mb-3">
+									<label class="form-label">Carbs (g)</label> <input
+										type="number" class="form-control" id="foodCarbs" step="0.1">
+								</div>
+								<div class="col-md-3 mb-3">
+									<label class="form-label">Fiber (g)</label> <input
+										type="number" class="form-control" id="foodFiber" step="0.1">
+								</div>
+								<div class="col-md-12 mb-3">
+									<label class="form-label">Health Benefits</label>
+									<textarea class="form-control" id="foodBenefits" rows="2"></textarea>
+								</div>
+							</div>
+							<button type="submit" class="btn btn-success">
+								<i class="fas fa-plus"></i> Add Food
+							</button>
+						</form>
+					</div>
+				</div>
+				<div class="card mb-4">
+					<div
+						class="card-header bg-info text-white d-flex justify-content-between">
+						<h5 class="mb-0">
+							<i class="fas fa-apple-alt"></i> Food Database
+						</h5>
+						<div>
+							<select
+								class="form-select form-select-sm d-inline-block w-auto me-2"
+								id="foodCategoryFilter" onchange="filterFoodsByCategory()">
+								<option value="">All Categories</option>
+								<option value="Leafy Green">Leafy Greens</option>
+								<option value="Root Vegetable">Root Vegetables</option>
+								<option value="Fruit">Fruits</option>
+								<option value="Whole Grain">Whole Grains</option>
+								<option value="Fish">Fish</option>
+								<option value="Nuts">Nuts</option>
+								<option value="Beverage">Beverages</option>
+								<option value="Spice">Spices</option>
+							</select>
+							<button class="btn btn-light btn-sm" onclick="loadAllFoods()">
+								<i class="fas fa-sync"></i> Refresh
+							</button>
+						</div>
+					</div>
+					<div class="card-body">
+						<div id="foodsContainer" class="row"></div>
+					</div>
+				</div>
+			</div>
+
+
+
+			<!-- Symptoms Tab -->
+			<div class="tab-pane fade" id="symptoms" role="tabpanel">
+				<!-- Adding Symptoms -->
+				<div class="card mb-4">
+					<div class="card-header bg-info text-white">
+						<h5 class="mb-0">
+							<i class="fas fa-plus"></i> Add New Symptom
+						</h5>
+					</div>
+					<div class="card-body">
+						<form id="addSymptomForm">
+							<div class="row">
+								<div class="col-md-6 mb-3">
+									<label class="form-label">Symptom Name</label> <input
+										type="text" class="form-control" id="symptomName" required>
+								</div>
+								<div class="col-md-6 mb-3">
+									<label class="form-label">Category</label> <input type="text"
+										class="form-control" id="symptomCategory"
+										placeholder="e.g., Digestive, Energy">
+								</div>
+								<div class="col-md-12 mb-3">
+									<label class="form-label">Description</label>
+									<textarea class="form-control" id="symptomDescription" rows="2"></textarea>
+								</div>
+								<div class="col-md-6 mb-3">
+									<label class="form-label">Severity</label> <select
+										class="form-control" id="symptomSeverity">
+										<option value="low">Low</option>
+										<option value="moderate">Moderate</option>
+										<option value="high">High</option>
+									</select>
+								</div>
+								<div class="col-md-12 mb-3">
+									<label class="form-label">Nutritional Guidance</label>
+									<textarea class="form-control" id="symptomGuidance" rows="2"></textarea>
+								</div>
+							</div>
+							<button type="submit" class="btn btn-warning">
+								<i class="fas fa-plus"></i> Add Symptom
+							</button>
+						</form>
+					</div>
+				</div>
+				<div class="card mb-4">
+					<div
+						class="card-header bg-info text-white d-flex justify-content-between">
+						<h5 class="mb-0">
+							<i class="fas fa-stethoscope"></i> Symptoms Database
+						</h5>
+						<button class="btn btn-dark btn-sm" onclick="loadAllSymptoms()">
+							<i class="fas fa-sync"></i> Refresh
+						</button>
+					</div>
+					<div class="card-body">
+						<div id="symptomsContainer" class="row"></div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Recommendations Tab -->
+			<div class="tab-pane fade" id="recommendations" role="tabpanel">
+				<div class="card">
+					<div class="card-header bg-info text-white">
+						<h5 class="mb-0">
+							<i class="fas fa-link"></i> Symptom-Food Recommendations
+						</h5>
+					</div>
+					<div class="card-body">
+						<div class="mb-3">
+							<label class="form-label">Select Symptom to View
+								Recommended Foods</label> <select class="form-select"
+								id="symptomSelector" onchange="loadRecommendationsForSymptom()">
+								<option value="">-- Select a Symptom --</option>
+							</select>
+						</div>
+						<div id="recommendationsContainer"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Alerts Container -->
+	<div id="alertContainer"
+		style="position: fixed; top: 80px; right: 20px; z-index: 1050; max-width: 400px;"></div>
+
+	<!-- Footer -->
+	<footer class="footer bg-dark text-white py-4 mt-5">
+		<div class="container text-center">
+			<p class="mb-0">&copy; 2024 NutriHeal Admin Dashboard</p>
+		</div>
+	</footer>
+
+	<script
+		src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+	<script
+		src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+
+	<script>
+    const API_BASE_URL = 'http://localhost:8080/api';
+
+    // Show alert message
+    function showAlert(message, type = 'success') {
+        const alertContainer = document.getElementById('alertContainer');
+        const alertId = 'alert-' + Date.now();
+        const alertHTML = `
+            <div id="${alertId}" class="alert alert-${type} alert-dismissible fade show" role="alert">
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        `;
+        alertContainer.insertAdjacentHTML('beforeend', alertHTML);
+        setTimeout(() => {
+            const alert = document.getElementById(alertId);
+            if (alert) alert.remove();
+        }, 5000);
+    }
+
+    // ===== USER MANAGEMENT =====
+    
+    document.getElementById('registerForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const username = document.getElementById('username').value;
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/users`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, email, password })
+            });
+
+            if (response.status === 201) {
+                showAlert(`User "${username}" registered successfully!`, 'success');
+                document.getElementById('registerForm').reset();
+                loadAllUsers();
+                updateStats();
+            } else if (response.status === 409) {
+                showAlert(`Username "${username}" already exists!`, 'warning');
+            } else {
+                showAlert('Registration failed. Please try again.', 'danger');
+            }
+        } catch (error) {
+            showAlert('Failed to register user: ' + error.message, 'danger');
+            console.error('Error:', error);
+        }
+    });
+
+    
+    
+    async function loadAllUsers() {
+        try {
+            const response = await fetch(`${API_BASE_URL}/users`);
+            if (!response.ok) throw new Error('Failed to load users');
+            
+            const users = await response.json();
+            const container = document.getElementById('usersContainer');
+
+            if (users.length === 0) {
+                container.innerHTML = '<div class="col-12"><div class="alert alert-info">No users registered yet.</div></div>';
+                return;
+            }
+
+            container.innerHTML = users.map(user => `
+                <div class="col-md-4 mb-3">
+                    <div class="card">
+                        <div class="card-body">
+                            <h6><i class="fas fa-user"></i> ${user.username}</h6>
+                            <p class="mb-1"><strong>ID:</strong> ${user.id}</p>
+                            <p class="mb-0"><strong>Email:</strong> ${user.email}</p>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            
+            // For Delete
+            container.innerHTML = users.map(user => `   
+            <div class="col-md-4 mb-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h6><i class="fas fa-user"></i> ${user.username}</h6>
+                        <p class="mb-1"><strong>ID:</strong> ${user.id}</p>
+                        <p class="mb-1"><strong>Email:</strong> ${user.email}</p>
+                        <button class="btn btn-danger btn-sm mt-2" onclick="deleteUser(${user.id}, '${user.username}')">
+                            <i class="fas fa-trash"></i> Delete
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+            
+        } catch (error) {
+            console.error('Error loading users:', error);
+            document.getElementById('usersContainer').innerHTML = 
+                '<div class="col-12"><div class="alert alert-danger">Failed to load users: ' + error.message + '</div></div>';
+        }
+    }
+
+    async function searchUser() {
+        const username = document.getElementById('searchUsername').value;
+        if (!username) {
+            showAlert('Please enter a username', 'warning');
+            return;
+        }
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/users/search/${username}`);
+            const resultDiv = document.getElementById('userResult');
+
+            if (response.ok) {
+                const user = await response.json();
+                resultDiv.innerHTML = `
+                    <div class="alert alert-success">
+                        <h6>User Found</h6>
+                        <p><strong>ID:</strong> ${user.id}</p>
+                        <p><strong>Username:</strong> ${user.username}</p>
+                        <p class="mb-0"><strong>Email:</strong> ${user.email}</p>
+                    </div>
+                `;
+            } else {
+                resultDiv.innerHTML = `<div class="alert alert-warning">User "${username}" not found.</div>`;
+            }
+        } catch (error) {
+            showAlert('Search failed: ' + error.message, 'danger');
+        }
+    }
+    
+ // ===== For Delete =====
+    async function deleteUser(userId, username) {
+        if (!confirm(`Are you sure you want to delete user "${username}"?`)) return;
+        
+        try {
+            const response = await fetch(`${API_BASE_URL}/users/${userId}`, {
+                method: 'DELETE'
+            });
+            
+            if (response.status === 204) {
+                showAlert(`User "${username}" deleted successfully!`, 'success');
+                loadAllUsers();
+                updateStats();
+            } else {
+                showAlert('Failed to delete user', 'danger');
+            }
+        } catch (error) {
+            showAlert('Error deleting user: ' + error.message, 'danger');
+        }
+    }
+    
+    
+
+    // ===== FOOD MANAGEMENT =====
+    
+    async function loadAllFoods() {
+        try {
+            const response = await fetch(`${API_BASE_URL}/foods`);
+            if (!response.ok) throw new Error('Failed to load foods');
+            
+            const foods = await response.json();
+            displayFoods(foods);
+        } catch (error) {
+            console.error('Error loading foods:', error);
+            showAlert('Failed to load foods: ' + error.message, 'danger');
+            document.getElementById('foodsContainer').innerHTML = 
+                '<div class="col-12"><div class="alert alert-danger">Failed to load foods: ' + error.message + '</div></div>';
+        }
+    }
+
+    function displayFoods(foods) {
+        const container = document.getElementById('foodsContainer');
+        
+        if (foods.length === 0) {
+            container.innerHTML = '<div class="col-12"><div class="alert alert-info">No foods in database yet.</div></div>';
+            return;
+        }
+
+        container.innerHTML = foods.map(food => `
+            <div class="col-md-6 mb-3">
+                <div class="food-card">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <h6><i class="fas fa-leaf text-success"></i> ${food.name}</h6>
+                        <button class="btn btn-danger btn-sm" onclick="deleteFood(${food.id}, '${food.name}')">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                    <p class="text-muted mb-2">${food.category || 'Uncategorized'}</p>
+                    <p class="small mb-2">${food.description || 'No description available'}</p>
+                    <div class="mb-2">
+                        <span class="nutrient-badge">Calories: ${food.calories || 0}</span>
+                        <span class="nutrient-badge">Protein: ${food.protein || 0}g</span>
+                        <span class="nutrient-badge">Fiber: ${food.fiber || 0}g</span>
+                    </div>
+                    ${food.healthBenefits ? `<p class="small text-success mb-0"><i class="fas fa-heart"></i> ${food.healthBenefits}</p>` : ''}
+                </div>
+            </div>
+        `).join('');
+    }
+
+    async function filterFoodsByCategory() {
+        const category = document.getElementById('foodCategoryFilter').value;
+        
+        try {
+            const url = category 
+                ? `${API_BASE_URL}/foods/category/${encodeURIComponent(category)}`
+                : `${API_BASE_URL}/foods`;
+            
+            const response = await fetch(url);
+            if (!response.ok) throw new Error('Failed to filter foods');
+            
+            const foods = await response.json();
+            displayFoods(foods);
+        } catch (error) {
+            console.error('Error filtering foods:', error);
+            showAlert('Failed to filter foods: ' + error.message, 'danger');
+        }
+    }
+    
+    // ADDING FOOD BUTTON
+    document.getElementById('addFoodForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const foodData = {
+            name: document.getElementById('foodName').value,
+            category: document.getElementById('foodCategory').value,
+            description: document.getElementById('foodDescription').value,
+            calories: parseFloat(document.getElementById('foodCalories').value) || 0,
+            protein: parseFloat(document.getElementById('foodProtein').value) || 0,
+            carbohydrates: parseFloat(document.getElementById('foodCarbs').value) || 0,
+            fiber: parseFloat(document.getElementById('foodFiber').value) || 0,
+            healthBenefits: document.getElementById('foodBenefits').value
+        };
+        
+        try {
+            const response = await fetch(`${API_BASE_URL}/foods`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(foodData)
+            });
+            
+            if (response.status === 201) {
+                showAlert(`Food "${foodData.name}" added successfully!`, 'success');
+                document.getElementById('addFoodForm').reset();
+                loadAllFoods();
+                updateStats();
+            } else if (response.status === 409) {
+                showAlert('Food already exists!', 'warning');
+            }
+        } catch (error) {
+            showAlert('Failed to add food: ' + error.message, 'danger');
+        }
+    });
+
+    // ===== SYMPTOM MANAGEMENT =====
+    
+    async function loadAllSymptoms() {
+        try {
+            const response = await fetch(`${API_BASE_URL}/symptoms`);
+            if (!response.ok) throw new Error('Failed to load symptoms');
+            
+            const symptoms = await response.json();
+            displaySymptoms(symptoms);
+            populateSymptomSelector(symptoms);
+        } catch (error) {
+            console.error('Error loading symptoms:', error);
+            showAlert('Failed to load symptoms: ' + error.message, 'danger');
+            document.getElementById('symptomsContainer').innerHTML = 
+                '<div class="col-12"><div class="alert alert-danger">Failed to load symptoms: ' + error.message + '</div></div>';
+        }
+    }
+
+    function displaySymptoms(symptoms) {
+        const container = document.getElementById('symptomsContainer');
+        
+        if (symptoms.length === 0) {
+            container.innerHTML = '<div class="col-12"><div class="alert alert-info">No symptoms in database yet.</div></div>';
+            return;
+        }
+
+        container.innerHTML = symptoms.map(symptom => `
+            <div class="col-md-6 mb-3">
+                <div class="symptom-card">
+                <div class="d-flex justify-content-between align-items-start">
+                <h6><i class="fas fa-heartbeat text-danger"></i> ${symptom.name}</h6>
+                <button class="btn btn-danger btn-sm" onclick="deleteSymptom(${symptom.id}, '${symptom.name}')">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+                    <p class="text-muted mb-2"><strong>Category:</strong> ${symptom.category || 'Uncategorized'}</p>
+                    <p class="small mb-2">${symptom.description || 'No description available'}</p>
+                    <p class="small mb-0"><strong>Severity:</strong> <span class="badge bg-warning">${symptom.severity || 'N/A'}</span></p>
+                    ${symptom.nutritionalGuidance ? `<p class="small text-info mt-2 mb-0"><i class="fas fa-info-circle"></i> ${symptom.nutritionalGuidance}</p>` : ''}
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function populateSymptomSelector(symptoms) {
+        const selector = document.getElementById('symptomSelector');
+        selector.innerHTML = '<option value="">-- Select a Symptom --</option>' +
+            symptoms.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
+    }
+
+    document.getElementById('addSymptomForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const symptomData = {
+            name: document.getElementById('symptomName').value,
+            category: document.getElementById('symptomCategory').value,
+            description: document.getElementById('symptomDescription').value,
+            severity: document.getElementById('symptomSeverity').value,
+            nutritionalGuidance: document.getElementById('symptomGuidance').value
+        };
+        
+        try {
+            const response = await fetch(`${API_BASE_URL}/symptoms`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(symptomData)
+            });
+            
+            if (response.status === 201) {
+                showAlert(`Symptom "${symptomData.name}" added successfully!`, 'success');
+                document.getElementById('addSymptomForm').reset();
+                loadAllSymptoms();
+                updateStats();
+            } else if (response.status === 409) {
+                showAlert('Symptom already exists!', 'warning');
+            }
+        } catch (error) {
+            showAlert('Failed to add symptom: ' + error.message, 'danger');
+        }
+    });
+    
+    
+    // ======= Delete foods & symptoms
+    async function deleteFood(foodId, foodName) {
+    if (!confirm(`Delete "${foodName}"?`)) return;
+    
+    try {
+        const response = await fetch(`${API_BASE_URL}/foods/${foodId}`, { method: 'DELETE' });
+        if (response.status === 204) {
+            showAlert(`Food deleted successfully!`, 'success');
+            loadAllFoods();
+            updateStats();
+        }
+    } catch (error) {
+        showAlert('Error deleting food: ' + error.message, 'danger');
+    }
+}
+
+async function deleteSymptom(symptomId, symptomName) {
+    if (!confirm(`Delete "${symptomName}"?`)) return;
+    
+    try {
+        const response = await fetch(`${API_BASE_URL}/symptoms/${symptomId}`, { method: 'DELETE' });
+        if (response.status === 204) {
+            showAlert(`Symptom deleted successfully!`, 'success');
+            loadAllSymptoms();
+            updateStats();
+        }
+    } catch (error) {
+        showAlert('Error deleting symptom: ' + error.message, 'danger');
+    }
+}
+
+    // ===== RECOMMENDATIONS =====
+    
+    async function loadRecommendationsForSymptom() {
+        const symptomId = document.getElementById('symptomSelector').value;
+        const container = document.getElementById('recommendationsContainer');
+        
+        if (!symptomId) {
+            container.innerHTML = '';
+            return;
+        }
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/foods/symptom/${symptomId}`);
+            if (!response.ok) throw new Error('Failed to load recommendations');
+            
+            const foods = await response.json();
+            
+            if (foods.length === 0) {
+                container.innerHTML = '<div class="alert alert-info">No food recommendations found for this symptom.</div>';
+                return;
+            }
+
+            container.innerHTML = `
+                <h6 class="mb-3">Recommended Foods (${foods.length})</h6>
+                <div class="row">
+                    ${foods.map(food => `
+                        <div class="col-md-6 mb-3">
+                            <div class="food-card">
+                                <h6><i class="fas fa-apple-alt text-success"></i> ${food.name}</h6>
+                                <p class="text-muted small mb-2">${food.category || 'Uncategorized'}</p>
+                                <p class="small mb-2">${food.description || ''}</p>
+                                ${food.healthBenefits ? `<p class="small text-success mb-0">${food.healthBenefits}</p>` : ''}
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        } catch (error) {
+            console.error('Error loading recommendations:', error);
+            container.innerHTML = '<div class="alert alert-danger">Failed to load recommendations: ' + error.message + '</div>';
+        }
+    }
+
+    // ===== STATS UPDATE =====
+    
+    async function updateStats() {
+        try {
+            const [usersRes, foodsRes, symptomsRes] = await Promise.all([
+                fetch(`${API_BASE_URL}/users`),
+                fetch(`${API_BASE_URL}/foods`),
+                fetch(`${API_BASE_URL}/symptoms`)
+            ]);
+
+            if (usersRes.ok) {
+                const users = await usersRes.json();
+                document.getElementById('userCount').textContent = users.length;
+            }
+            
+            if (foodsRes.ok) {
+                const foods = await foodsRes.json();
+                document.getElementById('foodCount').textContent = foods.length;
+            }
+            
+            if (symptomsRes.ok) {
+                const symptoms = await symptomsRes.json();
+                document.getElementById('symptomCount').textContent = symptoms.length;
+                
+                // Calculate total recommendations
+                let totalRecs = 0;
+                for (const symptom of symptoms) {
+                    try {
+                        const recsRes = await fetch(`${API_BASE_URL}/foods/symptom/${symptom.id}`);
+                        if (recsRes.ok) {
+                            const recs = await recsRes.json();
+                            totalRecs += recs.length;
+                        }
+                    } catch (error) {
+                        console.error('Error counting recommendations:', error);
+                    }
+                }
+                document.getElementById('recommendationCount').textContent = totalRecs;
+            }
+        } catch (error) {
+            console.error('Error updating stats:', error);
+        }
+    }
+
+    // ===== INITIALIZATION =====
+    
+    document.addEventListener('DOMContentLoaded', async function() {
+        console.log('Initializing admin dashboard...');
+        
+        // Load all data
+        await Promise.all([
+            loadAllUsers(),
+            loadAllFoods(),
+            loadAllSymptoms()
+        ]);
+        
+        // Update statistics
+        await updateStats();
+        
+        console.log('Admin dashboard initialized successfully');
+    });
+
+    // Add event listener for search button
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchBtn = document.getElementById('searchUsername');
+        if (searchBtn) {
+            searchBtn.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    searchUser();
+                }
+            });
+        }
+    });
+</script>
+</body>
+</html>

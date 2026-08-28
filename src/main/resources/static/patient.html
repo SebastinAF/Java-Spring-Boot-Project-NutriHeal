@@ -1,0 +1,1388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NutriHeal - AI Nutrition Assistant</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌱</text></svg>">
+    
+    <style>
+        :root {
+            --primary: #28a745;
+            --secondary: #17a2b8;
+            --success: #20c997;
+            --warning: #ffc107;
+            --danger: #dc3545;
+            --ai-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --db-gradient: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding-top: 80px;
+        }
+
+        .navbar {
+            background: rgba(255, 255, 255, 0.95) !important;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        }
+
+        .step-card {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            border: none;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            animation: fadeInUp 0.6s ease;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .step-header {
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 25px;
+            border-radius: 20px 20px 0 0;
+        }
+
+        .progress-indicator {
+            display: flex;
+            justify-content: center;
+            margin: 40px 0;
+            flex-wrap: wrap;
+        }
+
+        .progress-step {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #e9ecef;
+            color: #6c757d;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 10px;
+            font-weight: 700;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .progress-step.active {
+            background: var(--primary);
+            color: white;
+            transform: scale(1.2);
+            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4);
+        }
+
+        .progress-step.completed {
+            background: var(--success);
+            color: white;
+        }
+
+        .progress-step::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 60px;
+            width: 40px;
+            height: 3px;
+            background: #e9ecef;
+            transform: translateY(-50%);
+        }
+
+        .progress-step:last-child::after {
+            display: none;
+        }
+
+        .progress-step.completed::after {
+            background: var(--success);
+        }
+
+        .form-control, .form-select {
+            border-radius: 12px;
+            border: 2px solid #e9ecef;
+            padding: 12px 18px;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.15);
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            border: none;
+            border-radius: 25px;
+            padding: 12px 32px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(40, 167, 69, 0.3);
+        }
+
+        .symptom-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        .symptom-card {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: background 0.5s ease, color 0.3s ease, transform 0.3s ease;
+            border: 3px solid transparent;
+        }
+
+        .symptom-card:hover {
+            transform: translateY(-5px);
+            color: white;
+            background: linear-gradient(135deg, rgba(35, 203, 91, 0.9), rgba(2, 117, 16, 0.9));
+            box-shadow: 0 10px 25px rgba(15, 224, 18, 0.1);
+        }
+
+        .symptom-card.selected {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .symptom-icon {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        /* AI-Powered Recommendation Card */
+        .recommendation-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .recommendation-card.ai-powered {
+            background: linear-gradient(135deg, #fff 0%, #f8f5ff 100%);
+            border: 2px solid #667eea;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.2);
+        }
+
+        .recommendation-card.ai-powered::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--ai-gradient);
+        }
+
+        .recommendation-card.database::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--db-gradient);
+        }
+
+        .recommendation-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 35px rgba(0,0,0,0.15);
+        }
+
+        .ai-badge {
+            background: var(--ai-gradient);
+            color: white;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            box-shadow: 0 3px 10px rgba(102, 126, 234, 0.3);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                box-shadow: 0 3px 10px rgba(102, 126, 234, 0.3);
+            }
+            50% {
+                box-shadow: 0 3px 15px rgba(102, 126, 234, 0.5);
+            }
+        }
+
+        .db-badge {
+            background: var(--db-gradient);
+            color: white;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .food-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #2d3748;
+            margin: 15px 0 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .ai-powered .food-title {
+            color: #667eea;
+        }
+
+        .food-description {
+            color: #4a5568;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .ai-powered .food-description {
+            background: rgba(102, 126, 234, 0.05);
+            padding: 12px;
+            border-radius: 10px;
+            border-left: 3px solid #667eea;
+        }
+
+        .benefits-section {
+            background: #f7fafc;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+        }
+
+        .ai-powered .benefits-section {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(118, 75, 162, 0.05));
+            border: 1px solid rgba(102, 126, 234, 0.2);
+        }
+
+        .benefits-title {
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .ai-powered .benefits-title {
+            color: #667eea;
+        }
+
+        .nutrition-badge {
+            background: linear-gradient(45deg, var(--warning), #ffeb3b);
+            color: #333;
+            padding: 6px 14px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin: 4px;
+            display: inline-block;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .ai-powered .nutrition-badge {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .ai-insights-box {
+            background: var(--ai-gradient);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin-top: 30px;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+            animation: fadeInUp 0.8s ease;
+        }
+
+        .ai-insights-box h6 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .ai-insights-box p {
+            line-height: 1.8;
+            font-size: 0.95rem;
+            opacity: 0.95;
+        }
+
+        .source-indicator {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(102, 126, 234, 0.2);
+            border-top-color: #667eea;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .user-info-badge {
+            background: linear-gradient(45deg, var(--success), var(--primary));
+            color: white;
+            padding: 10px 20px;
+            border-radius: 10px;
+            display: inline-block;
+            margin: 5px;
+        }
+
+        .comparison-banner {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .comparison-banner h5 {
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        @media (max-width: 768px) {
+            .progress-step {
+                width: 40px;
+                height: 40px;
+                font-size: 0.9rem;
+                margin: 5px;
+            }
+            
+            .progress-step::after {
+                width: 20px;
+                left: 50px;
+            }
+        }
+        
+        /* AI Quota Navbar Badge */
+.quota-badge {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.3s ease;
+}
+
+.quota-badge:hover {
+    transform: scale(1.05);
+}
+
+.quota-badge.low {
+    background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%) !important;
+}
+
+.quota-badge.expired {
+    background: linear-gradient(135deg, #ff5252 0%, #d32f2f 100%) !important;
+}
+    </style>
+</head>
+<body>
+    <!-- Add to navigation -->
+<nav class="navbar navbar-expand-lg fixed-top">
+    <div class="container">
+        <a class="navbar-brand fw-bold fs-4" href="landing.html">
+            <i class="fas fa-heartbeat text-success"></i> NutriHeal
+        </a>
+        <div class="ms-auto">
+        <span id="userGreeting" class="text-muted"></span>
+        <div style="display: inline-block; margin-right: 20px;">
+                <small class="text-muted">AI Quota: </small>
+                <span class="badge" id="navQuotaBadge" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                    <i class="fas fa-robot"></i> <span id="navQuotaText">2/2</span>
+                </span>
+            </div>
+            <button class="btn btn-sm btn-outline-primary me-2" onclick="viewSavedPlans()">
+                <i class="fas fa-history"></i> My Plans
+            </button>
+            
+            <button class="btn btn-sm btn-outline-danger ms-3" onclick="logout()">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </button>
+        </div>
+    </div>
+</nav>
+
+    <!-- Alert Container -->
+    <div id="alertContainer" style="position: fixed; top: 80px; right: 20px; z-index: 1060; max-width: 400px;"></div>
+
+    <!-- Progress Indicator -->
+    <div class="container">
+        <div class="progress-indicator">
+            <div class="progress-step active" id="step1">1</div>
+            <div class="progress-step" id="step2">2</div>
+            <div class="progress-step" id="step3">3</div>
+            <div class="progress-step" id="step4">4</div>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Step 1: Complete Profile -->
+        <div id="profile-completion-step" class="step-card hidden">
+            <div class="step-header">
+                <h3><i class="fas fa-user-edit"></i> Complete Your Health Profile</h3>
+                <p class="mb-0">Tell us more about yourself for personalized recommendations</p>
+            </div>
+            <div class="card-body p-4">
+                <form id="profileCompletionForm">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-semibold">Activity Level *</label>
+                            <select class="form-select" id="activityLevel" required>
+                                <option value="">Select Activity Level</option>
+                                <option value="sedentary">Sedentary (Little/no exercise)</option>
+                                <option value="light">Lightly Active (1-3 days/week)</option>
+                                <option value="moderate">Moderately Active (3-5 days/week)</option>
+                                <option value="active">Very Active (6-7 days/week)</option>
+                                <option value="athlete">Athlete (Intense training)</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-semibold">Dietary Preference *</label>
+                            <select class="form-select" id="dietaryPreference" required>
+                                <option value="">Select Diet Type</option>
+                                <option value="non-vegetarian">Non-Vegetarian</option>
+                                <option value="vegetarian">Vegetarian</option>
+                                <option value="vegan">Vegan</option>
+                                <option value="pescatarian">Pescatarian (Fish only)</option>
+                                <option value="keto">Keto</option>
+                                <option value="paleo">Paleo</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-semibold">Weight (kg)</label>
+                            <input type="number" class="form-control" id="weight" step="0.1" placeholder="e.g., 70.5">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-semibold">Height (cm)</label>
+                            <input type="number" class="form-control" id="height" step="0.1" placeholder="e.g., 175">
+                        </div>
+                        <div class="col-md-12 mb-3">
+                            <label class="form-label fw-semibold">Health Goals *</label>
+                            <select class="form-select" id="healthGoals" required>
+                                <option value="">Select Primary Goal</option>
+                                <option value="weight-loss">Weight Loss</option>
+                                <option value="weight-gain">Weight/Muscle Gain</option>
+                                <option value="maintenance">Maintain Weight</option>
+                                <option value="disease-management">Disease Management</option>
+                                <option value="general-health">General Health</option>
+                                <option value="sports-performance">Sports Performance</option>
+                            </select>
+                        </div>
+                        <div class="col-md-12 mb-3">
+                            <label class="form-label fw-semibold">Food Allergies (Optional)</label>
+                            <input type="text" class="form-control" id="allergies" placeholder="e.g., peanuts, dairy, shellfish">
+                            <small class="text-muted">Separate with commas</small>
+                        </div>
+                        <div class="col-md-12 mb-3">
+                            <label class="form-label fw-semibold">Medical Conditions (Optional)</label>
+                            <input type="text" class="form-control" id="medicalConditions" placeholder="e.g., diabetes, hypertension">
+                            <small class="text-muted">Separate with commas</small>
+                        </div>
+                    </div>
+                    <div class="text-center mt-4">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="fas fa-arrow-right"></i> Continue to Symptom Assessment
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Step 2: Symptom Selection -->
+        <div id="symptom-step" class="step-card hidden">
+            <div class="step-header">
+                <h3><i class="fas fa-stethoscope"></i> Select Your Health Symptoms</h3>
+                <p class="mb-0">Choose all symptoms you're currently experiencing</p>
+            </div>
+            <div class="card-body p-4">
+                <div id="symptomsFromDB" class="symptom-grid"></div>
+                <div class="text-center mt-4">
+                    <button class="btn btn-outline-primary me-2" onclick="previousStep()">
+                        <i class="fas fa-arrow-left"></i> Previous
+                    </button>
+                    <button class="btn btn-primary" onclick="processSymptoms()">
+                        <i class="fas fa-robot"></i> Get AI Recommendations
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 3: AI Recommendations -->
+        <div id="recommendations-step" class="step-card hidden">
+            <div class="step-header">
+                <h3><i class="fas fa-brain"></i> AI-Powered Nutrition Recommendations</h3>
+                <p class="mb-0">Personalized food suggestions based on your profile</p>
+            </div>
+            <div class="card-body p-4">
+                <div id="loadingRecommendations" class="text-center py-5">
+                    <div class="loading-spinner mx-auto mb-3"></div>
+                    <h5><i class="fas fa-robot"></i> AI is analyzing your profile...</h5>
+                    <p class="text-muted">Creating personalized nutrition plan with advanced AI</p>
+                </div>
+                <div id="recommendationsContent" class="hidden"></div>
+                <div id="recommendationsButtons" class="text-center mt-4 hidden">
+                    <button class="btn btn-outline-primary me-2" onclick="previousStep()">
+                        <i class="fas fa-arrow-left"></i> Previous
+                    </button>
+                    <button class="btn btn-primary" onclick="createMealPlan()">
+                        <i class="fas fa-calendar-alt"></i> Generate Meal Plan
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 4: Meal Plan -->
+        <div id="mealplan-step" class="step-card hidden">
+            <div class="step-header">
+                <h3><i class="fas fa-calendar-week"></i> Your 7-Day Personalized Meal Plan</h3>
+                <p class="mb-0">Weekly meal schedule based on AI recommendations</p>
+            </div>
+            <div class="card-body p-4">
+                <div id="mealPlanContent"></div>
+                <div class="text-center mt-4">
+                    <button class="btn btn-outline-primary me-2" onclick="previousStep()">
+                        <i class="fas fa-arrow-left"></i> Previous
+                    </button>
+                    <button class="btn btn-success" onclick="savePlan()">
+                        <i class="fas fa-save"></i> Save My Plan
+                    </button>
+                    <button class="btn btn-primary ms-2" onclick="downloadPlan()">
+                        <i class="fas fa-download"></i> Download PDF
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const API_BASE_URL = 'http://localhost:8080/api';
+        let currentUser = null;
+        let currentStep = 1;
+        let selectedSymptoms = [];
+        let recommendations = [];
+        let mealPlan = null;
+        let isAIPowered = false;
+
+        document.addEventListener('DOMContentLoaded', async function() {
+            const userId = sessionStorage.getItem('nutrihealUserId');
+            
+            if (!userId) {
+                showAlert('Please login first', 'warning');
+                setTimeout(() => window.location.href = 'landing.html', 2000);
+                return;
+            }
+
+            await loadUserData(userId);
+            updateProgressIndicator();
+        });
+
+        async function loadUserData(userId) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/users/${userId}`);
+                if (response.ok) {
+                    currentUser = await response.json();
+                    document.getElementById('userGreeting').textContent = `Welcome, ${currentUser.username}!`;
+                    
+                    initializeQuotaTracker(currentUser.id);
+                    
+                    if (isProfileComplete()) {
+                        await loadSymptomsFromDB();
+                        showStep('symptom-step');
+                        currentStep = 2;
+                    } else {
+                        showStep('profile-completion-step');
+                    }
+                } else {
+                    throw new Error('User not found');
+                }
+            } catch (error) {
+                console.error('Error loading user:', error);
+                showAlert('Error loading user data', 'danger');
+                setTimeout(() => window.location.href = 'landing.html', 2000);
+            }
+        }
+
+        function isProfileComplete() {
+            return currentUser && 
+                   currentUser.activityLevel && 
+                   currentUser.dietaryPreference && 
+                   currentUser.healthGoals;
+        }
+
+        function showStep(stepId) {
+            document.querySelectorAll('.step-card').forEach(card => card.classList.add('hidden'));
+            document.getElementById(stepId).classList.remove('hidden');
+        }
+
+        document.getElementById('profileCompletionForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const profileData = {
+                ...currentUser,
+                activityLevel: document.getElementById('activityLevel').value,
+                dietaryPreference: document.getElementById('dietaryPreference').value,
+                weight: parseFloat(document.getElementById('weight').value) || null,
+                height: parseFloat(document.getElementById('height').value) || null,
+                healthGoals: document.getElementById('healthGoals').value,
+                allergies: document.getElementById('allergies').value || null,
+                medicalConditions: document.getElementById('medicalConditions').value || null
+            };
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/users/${currentUser.id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(profileData)
+                });
+
+                if (response.ok) {
+                    currentUser = await response.json();
+                    showAlert('Profile updated successfully!', 'success');
+                    await loadSymptomsFromDB();
+                    nextStep();
+                } else {
+                    showAlert('Failed to update profile', 'danger');
+                }
+            } catch (error) {
+                showAlert('Error: ' + error.message, 'danger');
+            }
+        });
+
+        async function loadSymptomsFromDB() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/symptoms`);
+                const symptoms = await response.json();
+                displaySymptoms(symptoms);
+            } catch (error) {
+                showAlert('Failed to load symptoms', 'danger');
+            }
+        }
+
+        function displaySymptoms(symptoms) {
+            const container = document.getElementById('symptomsFromDB');
+            container.innerHTML = symptoms.map(symptom => `
+                <div class="symptom-card" data-symptom-id="${symptom.id}" data-symptom-name="${symptom.name}">
+                    <div class="symptom-icon">
+                        <i class="fas fa-heartbeat"></i>
+                    </div>
+                    <h6>${symptom.name}</h6>
+                    <small class="text-muted">${symptom.category}</small>
+                </div>
+            `).join('');
+
+            document.querySelectorAll('.symptom-card').forEach(card => {
+                card.addEventListener('click', function() {
+                    this.classList.toggle('selected');
+                });
+            });
+        }
+
+        async function processSymptoms() {
+            const selectedCards = document.querySelectorAll('.symptom-card.selected');
+            
+            if (selectedCards.length === 0) {
+                showAlert('Please select at least one symptom', 'warning');
+                return;
+            }
+
+            selectedSymptoms = Array.from(selectedCards).map(card => ({
+                id: card.dataset.symptomId,
+                name: card.dataset.symptomName
+            }));
+
+            nextStep();
+            await generateAIRecommendations();
+        }
+
+        async function generateAIRecommendations() {
+            // Check quota first
+            if (!checkQuotaBeforeAI(currentUser.id)) {
+                recommendations = await getFoodsFromSymptoms();
+                isAIPowered = false;
+                document.getElementById('loadingRecommendations').style.display = 'none';
+                displayRecommendations();
+                return;
+            }
+            
+            document.getElementById('loadingRecommendations').style.display = 'block';
+            
+            const userContext = {
+                userId: currentUser.id,
+                age: currentUser.age,
+                gender: currentUser.gender,
+                activityLevel: currentUser.activityLevel,
+                dietaryPreference: currentUser.dietaryPreference,
+                weight: currentUser.weight,
+                height: currentUser.height,
+                healthGoals: currentUser.healthGoals,
+                allergies: currentUser.allergies,
+                medicalConditions: currentUser.medicalConditions,
+                symptoms: selectedSymptoms
+            };
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/ai/recommendations`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(userContext)
+                });
+
+                if (response.ok) {
+                    recommendations = await response.json();
+                    if (recommendations.status === 'success') {
+                        // Increment quota only if AI was successful
+                        await incrementQuotaUsage(currentUser.id);
+                        isAIPowered = true;
+                        showAlert('✨ AI recommendation generated!', 'success');
+                    } else {
+                        isAIPowered = false;
+                    }
+                } else {
+                    recommendations = await getFoodsFromSymptoms();
+                    isAIPowered = false;
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                recommendations = await getFoodsFromSymptoms();
+                isAIPowered = false;
+            }
+
+            document.getElementById('loadingRecommendations').style.display = 'none';
+            displayRecommendations();
+        }
+
+        async function getFoodsFromSymptoms() {
+            const allFoods = [];
+            for (const symptom of selectedSymptoms) {
+                try {
+                    const response = await fetch(`${API_BASE_URL}/foods/symptom/${symptom.id}`);
+                    if (response.ok) {
+                        const foods = await response.json();
+                        allFoods.push(...foods);
+                    }
+                } catch (error) {
+                    console.error('Error fetching foods:', error);
+                }
+            }
+            
+            const unique = allFoods.filter((food, index, self) =>
+                index === self.findIndex(f => f.id === food.id)
+            );
+            
+            return { 
+                recommendations: unique.slice(0, 10), 
+                aiInsights: "Recommendations based on symptom-food relationships from our curated nutrition database.",
+                status: 'fallback',
+                source: 'Database'
+            };
+        }
+
+        function displayRecommendations() {
+            const container = document.getElementById('recommendationsContent');
+            const recs = recommendations.recommendations || recommendations;
+            
+            let html = '';
+            
+            // Banner based on source
+            if (isAIPowered) {
+    html += `
+        <div class="comparison-banner">
+            <h5><i class="fas fa-robot"></i> Powered by AI</h5>
+            <p class="mb-0">Advanced AI analysis of your complete health profile with personalized reasoning</p>
+            <small style="opacity: 0.8; margin-top: 10px; display: block;">
+                <i class="fas fa-info-circle"></i> 
+                ${getQuotaStatus(currentUser.id).limit - getQuotaStatus(currentUser.id).used} AI recommendations remaining today
+            </small>
+        </div>
+    `;
+} else {
+    html += `
+        <div class="alert alert-info">
+            <h6><i class="fas fa-database"></i> Database Recommendations</h6>
+            <p class="mb-0">Curated foods from our nutrition database based on your symptoms</p>
+        </div>
+    `;
+}
+            
+            html += `
+                <div class="alert alert-light mb-4">
+                    <h6><i class="fas fa-user-circle"></i> Your Profile</h6>
+                    <span class="user-info-badge">${currentUser.age}yo ${currentUser.gender}</span>
+                    <span class="user-info-badge">${currentUser.activityLevel}</span>
+                    <span class="user-info-badge">${currentUser.dietaryPreference}</span>
+                    <span class="user-info-badge">Goal: ${currentUser.healthGoals}</span>
+                </div>
+                <div class="row">
+            `;
+            
+            // Display recommendations with enhanced styling
+            recs.forEach((food, index) => {
+                const cardClass = isAIPowered ? 'ai-powered' : 'database';
+                const badgeHtml = isAIPowered 
+                    ? '<span class="ai-badge"><i class="fas fa-brain"></i> AI Recommended</span>'
+                    : '<span class="db-badge"><i class="fas fa-database"></i> Database</span>';
+                
+                html += `
+                    <div class="col-md-6 mb-3">
+                        <div class="recommendation-card ${cardClass}">
+                            <div class="source-indicator">${badgeHtml}</div>
+                            
+                            <div class="food-title">
+                                <i class="fas fa-leaf ${isAIPowered ? 'text-primary' : 'text-success'}"></i>
+                                ${food.name}
+                            </div>
+                `;
+                
+                // AI cards get enhanced description
+                if (isAIPowered) {
+                    html += `
+                        <div class="food-description">
+                            ${food.description || food.reason || 'Personalized recommendation from AI analysis'}
+                        </div>
+                    `;
+                } else {
+                    html += `
+                        <p class="text-muted small mb-2">${food.description || ''}</p>
+                    `;
+                }
+                
+                // Benefits section
+                if (food.benefits || food.healthBenefits) {
+                    html += `
+                        <div class="benefits-section">
+                            <div class="benefits-title">
+                                <i class="fas fa-star"></i> Health Benefits
+                            </div>
+                            <p class="mb-0 small">${food.benefits || food.healthBenefits}</p>
+                        </div>
+                    `;
+                }
+                
+                // Nutritional info with enhanced badges
+                html += '<div class="mt-3">';
+                if (food.protein) html += `<span class="nutrition-badge"><i class="fas fa-dumbbell"></i> Protein: ${food.protein}g</span>`;
+                if (food.fiber) html += `<span class="nutrition-badge"><i class="fas fa-wheat"></i> Fiber: ${food.fiber}g</span>`;
+                if (food.calories) html += `<span class="nutrition-badge"><i class="fas fa-fire"></i> ${food.calories} cal</span>`;
+                if (food.vitaminC) html += `<span class="nutrition-badge"><i class="fas fa-lemon"></i> Vitamin C</span>`;
+                if (food.iron) html += `<span class="nutrition-badge"><i class="fas fa-magnet"></i> Iron</span>`;
+                if (food.calcium) html += `<span class="nutrition-badge"><i class="fas fa-bone"></i> Calcium</span>`;
+                html += '</div>';
+                
+                html += '</div></div>';
+            });
+            
+            html += '</div>';
+            
+            // AI Insights - prominently displayed for AI responses
+            if (recommendations.aiInsights) {
+                if (isAIPowered) {
+                    html += `
+                        <div class="ai-insights-box">
+                            <h6>
+                                <i class="fas fa-lightbulb"></i> 
+                                Personalized AI Insights
+                            </h6>
+                            
+                            <small style="opacity: 0.8;">
+                                <i class="fas fa-info-circle"></i> 
+                                Generated by AI based on your complete health profile
+                            </small>
+                        </div>
+                    `;
+                } else {
+                    html += `
+                        <div class="alert alert-success mt-3">
+                            <h6><i class="fas fa-info-circle"></i> Nutritional Guidance</h6>
+                            <p class="mb-0">${recommendations.aiInsights}</p>
+                        </div>
+                    `;
+                }
+            }
+            
+            container.innerHTML = html;
+            container.classList.remove('hidden');
+            document.getElementById('recommendationsButtons').classList.remove('hidden');
+        }
+
+        function createMealPlan() {
+            const foods = recommendations.recommendations || recommendations;
+            const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+            const meals = ['Breakfast', 'Lunch', 'Dinner', 'Snack'];
+            
+            mealPlan = days.map(day => ({
+                day,
+                meals: meals.map(meal => ({
+                    type: meal,
+                    foods: foods.sort(() => 0.5 - Math.random()).slice(0, meal === 'Snack' ? 1 : 2)
+                }))
+            }));
+            
+            displayMealPlan();
+            nextStep();
+        }
+
+        function displayMealPlan() {
+            const container = document.getElementById('mealPlanContent');
+            
+            let html = '';
+            
+            if (isAIPowered) {
+                html += `
+                    <div class="comparison-banner mb-4">
+                        <h5><i class="fas fa-magic"></i> AI-Generated Meal Plan</h5>
+                        <p class="mb-0">Personalized weekly schedule using Gemini AI recommendations</p>
+                    </div>
+                `;
+            }
+            
+            mealPlan.forEach(day => {
+                html += `
+                    <div class="card mb-3">
+                        <div class="card-header ${isAIPowered ? 'text-white' : 'bg-primary text-white'}" 
+                             style="${isAIPowered ? 'background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);' : ''}">
+                            <h5 class="mb-0"><i class="fas fa-calendar-day"></i> ${day.day}</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                `;
+                
+                day.meals.forEach(meal => {
+                    html += `
+                        <div class="col-md-6 col-lg-3 mb-2">
+                            <div class="recommendation-card ${isAIPowered ? 'ai-powered' : 'database'}" style="padding: 15px;">
+                                <h6><i class="fas fa-utensils"></i> ${meal.type}</h6>
+                                ${meal.foods.map(food => `
+                                    <p class="small mb-1">
+                                        <i class="fas fa-check-circle ${isAIPowered ? 'text-primary' : 'text-success'}"></i> 
+                                        ${food.name}
+                                    </p>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                html += '</div></div></div>';
+            });
+            
+            container.innerHTML = html;
+        }
+
+        async function savePlan() {
+            showAlert('Meal plan saved successfully!', 'success');
+        }
+
+        function downloadPlan() {
+            let text = `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+            text += `       🌱 NutriHeal Meal Plan 🌱\n`;
+            text += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n`;
+            text += `User: ${currentUser.username}\n`;
+            text += `Date: ${new Date().toLocaleDateString()}\n`;
+            text += `Source: ${isAIPowered ? '🤖 AI-Powered (Gemini 2.5 Pro)' : '📊 Database Recommendations'}\n`;
+            text += `\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n`;
+            
+            mealPlan.forEach(day => {
+                text += `📅 ${day.day.toUpperCase()}\n`;
+                text += `${'─'.repeat(40)}\n`;
+                day.meals.forEach(meal => {
+                    text += `  ${meal.type}:\n`;
+                    meal.foods.forEach(f => {
+                        text += `    • ${f.name}\n`;
+                    });
+                });
+                text += '\n';
+            });
+            
+            if (isAIPowered && recommendations.aiInsights) {
+                text += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+                text += `🧠 AI INSIGHTS \n`;
+                text += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n`;
+                text += `${recommendations.aiInsights}\n\n`;
+            }
+            
+            text += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+            text += `Generated by NutriHeal - Your AI Nutrition Assistant\n`;
+            text += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+            
+            const blob = new Blob([text], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `nutriheal-${isAIPowered ? 'ai' : 'db'}-meal-plan.txt`;
+            a.click();
+            
+            showAlert('Meal plan downloaded!', 'success');
+        }
+
+        function nextStep() {
+            currentStep++;
+            updateProgressIndicator();
+            
+            if (currentStep === 2) showStep('symptom-step');
+            if (currentStep === 3) showStep('recommendations-step');
+            if (currentStep === 4) showStep('mealplan-step');
+        }
+
+        function previousStep() {
+            currentStep--;
+            updateProgressIndicator();
+            
+            if (currentStep === 1) showStep('profile-completion-step');
+            if (currentStep === 2) showStep('symptom-step');
+            if (currentStep === 3) showStep('recommendations-step');
+        }
+
+        function updateProgressIndicator() {
+            for (let i = 1; i <= 4; i++) {
+                const step = document.getElementById(`step${i}`);
+                step.classList.remove('active', 'completed');
+                if (i < currentStep) step.classList.add('completed');
+                else if (i === currentStep) step.classList.add('active');
+            }
+        }
+
+        function logout() {
+            sessionStorage.clear();
+            window.location.href = 'landing.html';
+        }
+
+        function showAlert(message, type = 'success') {
+            const container = document.getElementById('alertContainer');
+            const id = 'alert-' + Date.now();
+            container.insertAdjacentHTML('beforeend', `
+                <div id="${id}" class="alert alert-${type} alert-dismissible fade show" role="alert">
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            `);
+            setTimeout(() => document.getElementById(id)?.remove(), 5000);
+        }
+        
+     // Update the savePlan() function
+        async function savePlan() {
+            try {
+                const planName = prompt('Enter a name for your meal plan:', 
+                    `Meal Plan - ${new Date().toLocaleDateString()}`);
+                
+                if (!planName) return;
+                
+                const response = await fetch(`${API_BASE_URL}/mealplans`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        userId: currentUser.id,
+                        planName: planName,
+                        planData: JSON.stringify(mealPlan),
+                        isAIPowered: isAIPowered,
+                        aiInsights: recommendations.aiInsights
+                    })
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    showAlert(`✅ Meal plan "${planName}" saved successfully!`, 'success');
+                } else {
+                    showAlert('Failed to save meal plan', 'danger');
+                }
+            } catch (error) {
+                showAlert('Error saving meal plan: ' + error.message, 'danger');
+            }
+        }
+
+        // Add new function to view saved plans
+        async function viewSavedPlans() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/mealplans/user/${currentUser.id}`);
+                
+                if (!response.ok) {
+                    showAlert('Failed to load saved plans', 'danger');
+                    return;
+                }
+                
+                const plans = await response.json();
+                
+                if (plans.length === 0) {
+                    showAlert('You have no saved meal plans yet', 'info');
+                    return;
+                }
+                
+                // Show modal with saved plans
+                showSavedPlansModal(plans);
+                
+            } catch (error) {
+                showAlert('Error loading plans: ' + error.message, 'danger');
+            }
+        }
+
+        // Show saved plans in a modal
+        function showSavedPlansModal(plans) {
+            let modalHTML = `
+                <div class="modal fade" id="savedPlansModal" tabindex="-1">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                                <h5 class="modal-title">
+                                    <i class="fas fa-history"></i> Your Saved Meal Plans
+                                </h5>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="list-group">
+            `;
+            
+            plans.forEach(plan => {
+                const date = new Date(plan.createdAt).toLocaleDateString();
+                const badge = plan.isAIPowered 
+                    ? '<span class="badge bg-primary"><i class="fas fa-robot"></i> AI</span>'
+                    : '<span class="badge bg-success"><i class="fas fa-database"></i> DB</span>';
+                
+                modalHTML += `
+                    <div class="list-group-item list-group-item-action" style="cursor: pointer;" onclick="loadMealPlan(${plan.id})">
+                        <div class="d-flex w-100 justify-content-between align-items-center">
+                            <h6 class="mb-1">
+                                <i class="fas fa-calendar-alt text-primary"></i> ${plan.planName}
+                            </h6>
+                            ${badge}
+                        </div>
+                        <small class="text-muted">
+                            <i class="fas fa-clock"></i> Created: ${date}
+                        </small>
+                        <button class="btn btn-sm btn-danger float-end" onclick="event.stopPropagation(); deleteMealPlan(${plan.id})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                `;
+            });
+            
+            modalHTML += `
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Remove existing modal if any
+            document.getElementById('savedPlansModal')?.remove();
+            
+            // Add modal to body
+            document.body.insertAdjacentHTML('beforeend', modalHTML);
+            
+            // Show modal
+            const modal = new bootstrap.Modal(document.getElementById('savedPlansModal'));
+            modal.show();
+        }
+
+        // Load a specific meal plan
+        async function loadMealPlan(planId) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/mealplans/${planId}`);
+                
+                if (!response.ok) {
+                    showAlert('Failed to load meal plan', 'danger');
+                    return;
+                }
+                
+                const plan = await response.json();
+                
+                // Parse the plan data
+                mealPlan = JSON.parse(plan.planData);
+                isAIPowered = plan.isAIPowered;
+                
+                // Set recommendations for context
+                recommendations = {
+                    recommendations: extractFoodsFromMealPlan(mealPlan),
+                    aiInsights: plan.aiInsights,
+                    status: plan.isAIPowered ? 'success' : 'fallback'
+                };
+                
+                // Navigate to meal plan step
+                currentStep = 4;
+                updateProgressIndicator();
+                showStep('mealplan-step');
+                displayMealPlan();
+                
+                // Close modal
+                bootstrap.Modal.getInstance(document.getElementById('savedPlansModal')).hide();
+                
+                showAlert(`Loaded: ${plan.planName}`, 'success');
+                
+            } catch (error) {
+                showAlert('Error loading meal plan: ' + error.message, 'danger');
+            }
+        }
+
+        // Extract foods from meal plan
+        function extractFoodsFromMealPlan(plan) {
+            const foods = [];
+            plan.forEach(day => {
+                day.meals.forEach(meal => {
+                    foods.push(...meal.foods);
+                });
+            });
+            return foods.filter((food, index, self) => 
+                index === self.findIndex(f => f.name === food.name)
+            );
+        }
+
+        // Delete a meal plan
+        async function deleteMealPlan(planId) {
+            if (!confirm('Are you sure you want to delete this meal plan?')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/mealplans/${planId}`, {
+                    method: 'DELETE'
+                });
+                
+                if (response.ok) {
+                    showAlert('Meal plan deleted successfully', 'success');
+                    // Refresh the list
+                    viewSavedPlans();
+                } else {
+                    showAlert('Failed to delete meal plan', 'danger');
+                }
+            } catch (error) {
+                showAlert('Error deleting meal plan: ' + error.message, 'danger');
+            }
+        }
+        
+        
+     // ===== QUOTA MANAGEMENT =====
+        const DAILY_QUOTA_LIMIT = 2;
+
+        function initializeQuotaTracker(userId) {
+            const today = new Date().toLocaleDateString();
+            const localQuota = JSON.parse(
+                localStorage.getItem(`quota_${userId}_${today}`) || 
+                '{"used": 0, "limit": 2}'
+            );
+            updateQuotaDisplay(localQuota, userId);
+        }
+
+        function updateQuotaDisplay(quotaData, userId) {
+            const remaining = quotaData.limit - quotaData.used;
+            
+            // Update NAVBAR badge (correct IDs from HTML)
+            const badge = document.getElementById('navQuotaBadge');
+            const text = document.getElementById('navQuotaText');
+            
+            if (badge && text) {
+                text.textContent = `${remaining}/${quotaData.limit}`;
+                
+                // Change color based on status
+                badge.classList.remove('low', 'expired');
+                
+                if (remaining <= 0) {
+                    badge.classList.add('expired');
+                    badge.style.background = 'linear-gradient(135deg, #ff5252 0%, #d32f2f 100%)';
+                } else if (remaining <= 1) {
+                    badge.classList.add('low');
+                    badge.style.background = 'linear-gradient(135deg, #ff9800 0%, #f57c00 100%)';
+                } else {
+                    badge.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+                }
+            }
+        }
+
+        function getQuotaStatus(userId) {
+            const today = new Date().toLocaleDateString();
+            return JSON.parse(
+                localStorage.getItem(`quota_${userId}_${today}`) || 
+                '{"used": 0, "limit": 2}'
+            );
+        }
+
+        async function incrementQuotaUsage(userId) {
+            const today = new Date().toLocaleDateString();
+            let quota = JSON.parse(
+                localStorage.getItem(`quota_${userId}_${today}`) || 
+                '{"used": 0, "limit": 2}'
+            );
+            
+            quota.used++;
+            localStorage.setItem(`quota_${userId}_${today}`, JSON.stringify(quota));
+            
+            updateQuotaDisplay(quota, userId);
+            return quota.used <= DAILY_QUOTA_LIMIT;
+        }
+
+        function checkQuotaBeforeAI(userId) {
+            const quotaStatus = getQuotaStatus(userId);
+            const remaining = quotaStatus.limit - quotaStatus.used;
+            
+            if (remaining <= 0) {
+                showAlert('⏰ Daily AI limit reached! Using database recommendations instead.', 'warning');
+                return false;
+            }
+            
+            return true;
+        }
+    </script>
+</body>
+</html>
