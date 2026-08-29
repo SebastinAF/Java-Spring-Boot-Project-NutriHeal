@@ -1,54 +1,17 @@
 services:
 
-  mysql:
-    image: mysql:8.0
-    container_name: nutriheal-mysql
-
-    environment:
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
-      MYSQL_USER: ${MYSQL_USER}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-
-    ports:
-      - "3307:3306"
-
-    volumes:
-      - mysql_data:/var/lib/mysql
-
-    healthcheck:
-      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -u root -p\"$${MYSQL_ROOT_PASSWORD}\" --silent"]
-      interval: 5s
-      timeout: 5s
-      retries: 10
-      start_period: 10s
-
-
   nutriheal-app:
+
     build:
       context: .
       dockerfile: Dockerfile
 
     image: nutriheal-app:latest
+
     container_name: nutriheal-app
 
-    depends_on:
-      mysql:
-        condition: service_healthy
-
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/nutriheal_db
-      SPRING_DATASOURCE_USERNAME: ${MYSQL_USER}
-      SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD}
-
-      SPRING_MAIL_USERNAME: ${SPRING_MAIL_USERNAME}
-      SPRING_MAIL_PASSWORD: ${SPRING_MAIL_PASSWORD}
-
-      GEMINI_API_KEY: ${GEMINI_API_KEY}
+    env_file:
+      - .env
 
     ports:
       - "8080:8080"
-
-
-volumes:
-  mysql_data:

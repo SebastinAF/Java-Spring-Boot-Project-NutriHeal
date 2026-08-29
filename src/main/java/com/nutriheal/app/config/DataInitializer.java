@@ -23,15 +23,25 @@ public class DataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
+
         if (foodRepository.count() == 0 && symptomRepository.count() == 0) {
+
             System.out.println("🌱 Initializing database with food and symptom data...");
+
             initializeSymptoms();
+
             initializeFoods();
-            createSymptomFoodRelationships();
-            System.out.println("✅ Database initialization completed!");
+
         } else {
-            System.out.println("📊 Database already contains data. Skipping initialization.");
+
+            System.out.println("📊 Database already contains data. Skipping food/symptom initialization.");
+
         }
+
+        // Always create/update symptom-food relationships
+        createSymptomFoodRelationships();
+
+        System.out.println("✅ Symptom-food relationships created/updated!");
     }
 
     private void initializeSymptoms() {
